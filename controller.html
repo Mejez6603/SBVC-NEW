@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SBVC - Controller</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,700;1,7..72,400&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Ubuntu:wght@400;500;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header id="topnav" class="topnav"></header>
+
+  <div class="main">
+    <!-- books -->
+    <div class="col books">
+      <div class="heads"><div>OLD</div><div>NEW</div></div>
+      <div class="lists">
+        <div class="scroll" id="booksOld"></div>
+        <div class="scroll" id="booksNew"></div>
+      </div>
+    </div>
+
+    <!-- chapters -->
+    <div class="col chapters" id="chapters"></div>
+
+    <!-- verses -->
+    <div class="versions">
+      <div class="col">
+        <div class="vhead">English</div>
+        <div class="vsel" id="engSel"></div>
+        <div class="verses scroll" id="engVerses"></div>
+      </div>
+      <div class="col">
+        <div class="vhead">Tagalog</div>
+        <div class="vsel" id="tlSel"></div>
+        <div class="verses scroll" id="tlVerses"></div>
+      </div>
+    </div>
+
+    <!-- right panel -->
+    <div class="col side">
+      <div class="tabs" id="sideTabs" style="grid-template-columns:1fr 1fr">
+        <button data-pane="paneMain" class="on">Controls</button>
+        <button data-pane="paneSearch">Search</button>
+      </div>
+
+      <div class="tabpane on" id="paneMain">
+        <div class="presentation">
+          <div class="preview" id="preview"></div>
+          <div class="btnrow">
+            <button class="btn outline icon" id="bShow" title="Show screen (open presentation window)">&#9654;</button>
+            <button class="btn outline icon" id="bClear" title="Clear screen">&#10005;</button>
+            <button class="btn outline icon" id="bTheme" title="Toggle theme (black / white background)"></button>
+            <button class="btn outline icon" id="bReset" title="Reset text positions">&#8635;</button>
+            <button class="btn outline icon" id="bFull" title="Fullscreen the presentation window (F)">&#9974;</button>
+          </div>
+        </div>
+        <div class="custom-title">Customization</div>
+        <div class="scroll" style="flex:1"><div class="custom" id="custom"></div></div>
+      </div>
+
+      <div class="tabpane" id="paneSearch">
+        <div class="scroll" style="flex:1">
+          <div class="searchpane">
+            <div>
+              <div style="font-weight:600;margin-bottom:8px">Search</div>
+              <div class="searchbox">
+                <input type="text" id="q" placeholder="Enter a topic (e.g., 'love', 'earth')">
+                <button class="btn sm" id="qGo">Go</button>
+              </div>
+              <p class="muted" id="qInfo" style="font-size:12px;margin:8px 0 0"></p>
+            </div>
+            <div class="results" id="results"></div>
+            <hr class="sep">
+            <div class="notes">
+              <div style="font-weight:600">Notepad</div>
+              <textarea id="notes" placeholder="Take notes here..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="data/books.js"></script>
+<script src="js/state.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/controller.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SBVC - About</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page">
+    <header id="topnav" class="topnav"></header>
+    <div class="doc">
+      <aside>
+        <h3>On this page</h3>
+        <a href="#description">Description</a>
+        <a href="#how">How It Works</a>
+        <a href="#run">Running It</a>
+      </aside>
+      <main class="scroll" style="overflow-y:auto">
+        <article>
+          <h1>SBVC - Show Bible Verse Controller</h1>
+          <h2 id="description">Description</h2>
+          <p>SBVC presents Bible passages and hymns for church services and Bible studies. The operator works in the <strong>Controller</strong> window; the audience sees only the clean <strong>Presentation</strong> window on a second screen or projector.</p>
+          <p>This is the static version: plain HTML, CSS, JavaScript and data files. No build step and no Node.</p>
+          <h2 id="how">How It Works</h2>
+          <ol>
+            <li>Choose a verse in the controller. It is written to <code>localStorage</code>.</li>
+            <li>The presentation window listens for <code>storage</code> events and redraws instantly.</li>
+            <li>Theme, fonts, sizes, colours and text positions travel the same way.</li>
+          </ol>
+          <p>Both windows must be in the same browser and profile on the same computer.</p>
+          <h2 id="run">Running It</h2>
+          <p>Double-click <code>START.bat</code>, then open <code>http://localhost:8765/controller.html</code>. Press <strong>Show</strong> to open the presentation window, and <strong>F</strong> to go fullscreen.</p>
+        </article>
+      </main>
+    </div>
+  </div>
+  <script src="js/nav.js"></script>
+</body>
+</html>
