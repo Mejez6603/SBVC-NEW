@@ -16,6 +16,21 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  // Scroll ONLY the list that holds the node (scrollIntoView can also scroll the whole page).
+  function scrollWithin(node, mode) {
+    var host = node.closest('.scroll');
+    if (!host) return;
+    var h = host.getBoundingClientRect(), n = node.getBoundingClientRect();
+    if (mode === 'center') {
+      var top = host.scrollTop + (n.top - h.top) - (h.height - n.height) / 2;
+      host.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } else if (n.top < h.top) {
+      host.scrollTop += n.top - h.top;
+    } else if (n.bottom > h.bottom) {
+      host.scrollTop += n.bottom - h.bottom;
+    }
+  }
+
   /* ------------------------------------------------------------------ *
    * Selection state (the equivalent of BibleContext)
    * ------------------------------------------------------------------ */
@@ -30,33 +45,55 @@
   };
   if (BK.allBooks.indexOf(sel.book) < 0) { sel.book = null; sel.chapter = null; }
 
+  // remember what is open so a refresh or a closed tab brings you back to the same place
+  var currentTab = 'paneMain';
+  function saveUi() {
+    S.setJSON(K.ctrlUi, { tagalog: sel.tagalog, verse: sel.verse, version: sel.version, tab: currentTab, query: $('q').value });
+  }
+  var savedUi = S.getJSON(K.ctrlUi, null);
+  if (savedUi) {
+    if (savedUi.tagalog === 'ADB' || savedUi.tagalog === 'TCB') sel.tagalog = savedUi.tagalog;
+    // the highlighted verse only comes back if it is still what the screen shows
+    var shown = S.getJSON(K.passage, null);
+    if (savedUi.verse && sel.book && shown && shown.reference === sel.book + ' ' + sel.chapter + ':' + savedUi.verse &&
+        ['KJV', 'ADB', 'TCB'].indexOf(savedUi.version) >= 0) {
+      sel.verse = savedUi.verse; sel.version = savedUi.version;
+    }
+    if (typeof savedUi.query === 'string') $('q').value = savedUi.query;
+  }
+
   function theme() { return S.getTheme(); }
   function setPassage(p) { S.setJSON(K.passage, p); }
 
   function selectBook(book) {
     sel.book = book; sel.chapter = 1; sel.verse = null; sel.version = null; sel.focus = null;
     S.setRaw(K.book, book); S.setRaw(K.chapter, '1');
-    setPassage(null);
-    renderBooks(); renderChapters(); renderVerses();
+    // the projected passage stays on screen until a new verse is clicked (or Clear is pressed)
+    renderBooks(); renderChapters(); renderVerses(); saveUi();
   }
   function selectChapter(ch) {
     sel.chapter = ch; sel.verse = null; sel.version = null; sel.focus = null;
     S.setRaw(K.chapter, String(ch));
-    setPassage(null);
-    renderChapters(); renderVerses();
+    renderChapters(); renderVerses(); saveUi();
   }
   function selectVerse(verse, version, text) {
     sel.verse = verse; sel.version = version; sel.focus = null;
     setPassage({ reference: sel.book + ' ' + sel.chapter + ':' + verse, text: text });
-    S.setRaw(K.bg, S.bgForTheme(theme()));
     markSelectedVerses();
+    scrollTwinIntoView(); saveUi(); // bring the same verse of the OTHER translation into view
+  }
+
+  // The same verse number in the other column (the one that was NOT clicked)
+  function scrollTwinIntoView() {
+    var twin = document.querySelector('.verse.twin');
+    if (twin) scrollWithin(twin, 'center');
   }
   // used by search results: jump to a verse without projecting it
   function navigateToVerse(book, chapter, verse) {
     if (BK.allBooks.indexOf(book) < 0) return;
     sel.book = book; sel.chapter = chapter; sel.verse = null; sel.version = null; sel.focus = verse;
     S.setRaw(K.book, book); S.setRaw(K.chapter, String(chapter));
-    renderBooks(); renderChapters(); renderVerses();
+    renderBooks(); renderChapters(); renderVerses(); saveUi();
   }
 
   /* ------------------------------------------------------------------ *
@@ -75,7 +112,7 @@
       host.appendChild(wrap);
     });
     var active = document.querySelector('.books .item.sel');
-    if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
+    if (active) scrollWithin(active, 'nearest');
   }
 
   function renderChapters() {
@@ -100,7 +137,7 @@
     list.appendChild(wrap);
     host.appendChild(list);
     var active = host.querySelector('.item.sel');
-    if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
+    if (active) scrollWithin(active, 'nearest');
   }
 
   /* ------------------------------------------------------------------ *
@@ -118,7 +155,7 @@
     var tl = $('tlSel'); tl.textContent = '';
     [['ADB', 'ADB1905'], ['TCB', 'TCB2015']].forEach(function (p) {
       var b = el('button', 'btn sm ' + (sel.tagalog === p[0] ? '' : 'ghost'), p[1]);
-      b.onclick = function () { sel.tagalog = p[0]; renderVersionButtons(); renderVerseColumn('tlVerses', p[0]); };
+      b.onclick = function () { sel.tagalog = p[0]; saveUi(); renderVersionButtons(); renderVerseColumn('tlVerses', p[0]); };
       tl.appendChild(b);
     });
   }
@@ -162,8 +199,8 @@
       });
       host.appendChild(wrap);
       markSelectedVerses();
-      var target = wrap.querySelector('.verse.sel') || wrap.querySelector('.verse.focus');
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var target = wrap.querySelector('.verse.sel') || wrap.querySelector('.verse.twin') || wrap.querySelector('.verse.focus');
+      if (target) scrollWithin(target, 'center');
     }).catch(function (e) {
       if (token !== host._token) return;
       host.textContent = '';
@@ -177,84 +214,14 @@
       var n = parseInt(b.dataset.verse, 10);
       b.classList.toggle('sel', sel.verse === n && sel.version === b.dataset.version);
       b.classList.toggle('focus', sel.focus === n);
+      // same verse number in the other translation's column: marked softly so it is easy to find
+      b.classList.toggle('twin', sel.verse === n && sel.version !== null && sel.version !== b.dataset.version);
     });
   }
 
-  /* ------------------------------------------------------------------ *
-   * Live preview with draggable title/text
-   * ------------------------------------------------------------------ */
-  var preview = $('preview');
-  var dragging = null;
-
-  function previewScale() { return (preview.clientWidth || 1280) / 1280; }
-
-  function renderPreview() {
-    if (dragging) return;
-    var passage = S.getJSON(K.passage, null);
-    var c = S.getCustom();
-    var scale = previewScale();
-
-    preview.style.backgroundColor = S.getRaw(K.bg) || '#000000';
-    preview.style.paddingLeft = preview.style.paddingRight = (c.horizontalPadding * scale) + 'rem';
-    preview.textContent = '';
-
-    if (!passage) {
-      preview.appendChild(el('div', 'none', 'No content selected'));
-      return;
-    }
-
-    var h = el('h1', '', passage.reference);
-    h.style.fontFamily = S.fontFamily(c.titleFontFamily);
-    h.style.fontSize = (c.titleFontSize * scale) + 'rem';
-    h.style.color = c.titleColor;
-    h.style.textAlign = c.textAlign;
-    h.style.transform = 'translate(' + (c.positions.title.x * scale) + 'px,' + (c.positions.title.y * scale) + 'px)';
-
-    var p = el('p', '', passage.text);
-    p.style.fontFamily = S.fontFamily(c.fontFamily);
-    p.style.fontSize = (c.fontSize * scale) + 'rem';
-    p.style.lineHeight = c.lineHeight;
-    p.style.color = c.textColor;
-    p.style.textAlign = c.textAlign;
-    p.style.transform = 'translate(' + (c.positions.text.x * scale) + 'px,' + (c.positions.text.y * scale) + 'px)';
-
-    makeDraggable(h, 'title');
-    makeDraggable(p, 'text');
-    preview.appendChild(h);
-    preview.appendChild(p);
-  }
-
-  function makeDraggable(node, which) {
-    node.addEventListener('pointerdown', function (e) {
-      var c = S.getCustom();
-      var scale = previewScale();
-      dragging = { which: which, sx: e.clientX, sy: e.clientY, ox: c.positions[which].x, oy: c.positions[which].y, scale: scale };
-      node.classList.add('dragging');
-      node.setPointerCapture(e.pointerId);
-      e.preventDefault();
-    });
-    node.addEventListener('pointermove', function (e) {
-      if (!dragging || dragging.which !== which) return;
-      var dx = e.clientX - dragging.sx, dy = e.clientY - dragging.sy;
-      node.style.transform = 'translate(' + (dragging.ox * dragging.scale + dx) + 'px,' + (dragging.oy * dragging.scale + dy) + 'px)';
-    });
-    function end(e) {
-      if (!dragging || dragging.which !== which) return;
-      var d = dragging;
-      dragging = null;
-      var c = S.getCustom();
-      var positions = { title: c.positions.title, text: c.positions.text };
-      positions[which] = {
-        x: d.ox + (e.clientX - d.sx) / d.scale,
-        y: d.oy + (e.clientY - d.sy) / d.scale
-      };
-      S.setCustom({ positions: positions }); // triggers renderPreview via onChange
-    }
-    node.addEventListener('pointerup', end);
-    node.addEventListener('pointercancel', end);
-  }
-
-  if (window.ResizeObserver) new ResizeObserver(function () { renderPreview(); }).observe(preview);
+  // Shared widgets: live preview and customization panel (see js/preview.js, js/custompanel.js)
+  var pv = S.createPreview($('preview'), { customKey: K.custom, media: false, bgImage: true });
+  var panel = S.createCustomPanel($('custom'), K.custom, { background: true });
 
   /* ------------------------------------------------------------------ *
    * Control buttons
@@ -264,7 +231,7 @@
     // same-named window is re-used, so repeated clicks do not open new tabs
     presentWin = window.open('present.html', 'present');
   };
-  $('bClear').onclick = function () { setPassage(null); sel.verse = null; sel.version = null; markSelectedVerses(); };
+  $('bClear').onclick = function () { setPassage(null); sel.verse = null; sel.version = null; markSelectedVerses(); saveUi(); };
   $('bReset').onclick = function () { S.setCustom({ positions: { title: { x: 0, y: 0 }, text: { x: 0, y: 0 } } }); };
   $('bFull').onclick = requestFullscreen;
   function requestFullscreen() { S.setRaw(K.fullscreen, String(Date.now())); }
@@ -274,6 +241,7 @@
     var next = theme() === 'dark' ? 'light' : 'dark';
     S.setRaw(K.theme, next);
     // the screen background follows the theme right away (the original only did this on the next verse)
+    S.setRaw(K.bgImage, null);
     S.setRaw(K.bg, S.bgForTheme(next));
     renderThemeButton();
   };
@@ -285,117 +253,6 @@
     e.preventDefault();
     requestFullscreen();
   });
-
-  /* ------------------------------------------------------------------ *
-   * Customization panel
-   * ------------------------------------------------------------------ */
-  var FONTS = [
-    ['Inter', 'Inter (Sans-serif)'], ['Literata', 'Literata (Serif)'], ['monospace', 'Monospace'],
-    ['Georgia', 'Georgia'], ['Times New Roman', 'Times New Roman'], ['Roboto', 'Roboto'],
-    ['Open Sans', 'Open Sans'], ['Lato', 'Lato'], ['Montserrat', 'Montserrat'], ['Oswald', 'Oswald'],
-    ['Raleway', 'Raleway'], ['Merriweather', 'Merriweather'], ['Playfair Display', 'Playfair Display'],
-    ['Ubuntu', 'Ubuntu'], ['Noto Sans', 'Noto Sans']
-  ];
-  var PRESET_COLORS = ['#D4A373', '#F5EBDD', '#FFFFFF', '#808080', '#000000'];
-  var syncers = []; // functions that refresh a control from the stored customization
-
-  function section(title) { return el('h4', '', title); }
-
-  function fontSelect(label, key) {
-    var f = el('div', 'field');
-    f.appendChild(el('label', 'lbl', label));
-    var s = el('select');
-    FONTS.forEach(function (p) { var o = el('option', '', p[1]); o.value = p[0]; s.appendChild(o); });
-    s.onchange = function () { var u = {}; u[key] = s.value; S.setCustom(u); };
-    f.appendChild(s);
-    syncers.push(function (c) { s.value = c[key]; });
-    return f;
-  }
-
-  function slider(label, key, min, max, step, unit) {
-    var f = el('div', 'field');
-    var l = el('label', 'lbl');
-    var r = el('input'); r.type = 'range'; r.min = min; r.max = max; r.step = step;
-    r.oninput = function () { var u = {}; u[key] = parseFloat(r.value); S.setCustom(u); };
-    f.appendChild(l); f.appendChild(r);
-    syncers.push(function (c) { r.value = c[key]; l.textContent = label + ' (' + c[key] + unit + ')'; });
-    return f;
-  }
-
-  function colorRow(label, key) {
-    var f = el('div', 'field');
-    f.appendChild(el('label', 'lbl', label));
-    var row = el('div', 'swatches');
-    var swatches = PRESET_COLORS.map(function (col) {
-      var b = el('button', 'swatch'); b.style.backgroundColor = col; b.title = col;
-      b.onclick = function () { var u = {}; u[key] = col; S.setCustom(u); };
-      row.appendChild(b);
-      return [b, col];
-    });
-    var pick = el('input'); pick.type = 'color'; pick.className = 'sr';
-    var pb = el('button', 'btn outline icon', '🎨'); pb.title = 'Custom color';
-    pb.style.width = '32px'; pb.style.height = '32px'; pb.style.borderRadius = '50%';
-    pb.onclick = function () { pick.click(); };
-    pick.oninput = function () { var u = {}; u[key] = pick.value; S.setCustom(u); };
-    row.appendChild(pb); row.appendChild(pick);
-    f.appendChild(row);
-    syncers.push(function (c) {
-      pick.value = c[key];
-      swatches.forEach(function (s) { s[0].classList.toggle('on', c[key].toLowerCase() === s[1].toLowerCase()); });
-    });
-    return f;
-  }
-
-  function alignRow() {
-    var f = el('div', 'field');
-    f.appendChild(el('label', 'lbl', 'Text Alignment'));
-    var row = el('div', 'aligns');
-    var btns = [['left', 'Left'], ['center', 'Center'], ['right', 'Right'], ['justify', 'Justify']].map(function (p) {
-      var b = el('button', 'btn outline', p[1]); b.style.padding = '0'; b.style.fontSize = '12px';
-      b.onclick = function () { S.setCustom({ textAlign: p[0] }); };
-      row.appendChild(b);
-      return [b, p[0]];
-    });
-    f.appendChild(row);
-    syncers.push(function (c) {
-      btns.forEach(function (b) { b[0].className = 'btn ' + (c.textAlign === b[1] ? 'secondary' : 'outline'); });
-    });
-    return f;
-  }
-
-  function buildCustomPanel() {
-    var host = $('custom');
-    host.appendChild(section('Title'));
-    host.appendChild(fontSelect('Font Family', 'titleFontFamily'));
-    host.appendChild(slider('Font Size', 'titleFontSize', 1, 10, 0.25, 'rem'));
-    host.appendChild(colorRow('Font Color', 'titleColor'));
-    host.appendChild(el('hr', 'sep'));
-
-    host.appendChild(section('Text'));
-    host.appendChild(fontSelect('Font Family', 'fontFamily'));
-    host.appendChild(slider('Font Size', 'fontSize', 1, 10, 0.25, 'rem'));
-    host.appendChild(slider('Line Spacing', 'lineHeight', 1, 3, 0.1, ''));
-    host.appendChild(colorRow('Font Color', 'textColor'));
-    host.appendChild(alignRow());
-    host.appendChild(el('hr', 'sep'));
-
-    host.appendChild(section('Layout'));
-    host.appendChild(slider('Horizontal Padding', 'horizontalPadding', 0, 10, 0.5, 'rem'));
-    host.appendChild(el('hr', 'sep'));
-
-    var pos = el('button', 'btn outline', '↻ Reset Positions');
-    pos.onclick = function () { S.setCustom({ positions: { title: { x: 0, y: 0 }, text: { x: 0, y: 0 } } }); };
-    host.appendChild(pos);
-    host.appendChild(el('hr', 'sep'));
-    var all = el('button', 'btn danger', 'Reset All Customizations');
-    all.onclick = function () { S.resetCustom(); };
-    host.appendChild(all);
-  }
-
-  function syncCustomPanel() {
-    var c = S.getCustom();
-    syncers.forEach(function (fn) { fn(c); });
-  }
 
   /* ------------------------------------------------------------------ *
    * Search (plain text match across KJV + ADB + TCB, as in the original)
@@ -524,6 +381,7 @@
 
   $('qGo').onclick = runSearch;
   $('q').addEventListener('keydown', function (e) { if (e.key === 'Enter') runSearch(); });
+  $('q').addEventListener('input', function () { saveUi(); });
 
   // notepad: remembered between sessions
   var notes = $('notes');
@@ -534,26 +392,31 @@
    * Tabs + start up
    * ------------------------------------------------------------------ */
   document.querySelectorAll('#sideTabs button').forEach(function (b) {
-    b.onclick = function () {
-      document.querySelectorAll('#sideTabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
-      document.querySelectorAll('.side .tabpane').forEach(function (p) { p.classList.toggle('on', p.id === b.dataset.pane); });
-    };
+    b.onclick = function () { showTab(b.dataset.pane); saveUi(); };
   });
+  function showTab(pane) {
+    currentTab = pane;
+    document.querySelectorAll('#sideTabs button').forEach(function (x) { x.classList.toggle('on', x.dataset.pane === pane); });
+    document.querySelectorAll('.side .tabpane').forEach(function (p) { p.classList.toggle('on', p.id === pane); });
+  }
+  if (savedUi && (savedUi.tab === 'paneMain' || savedUi.tab === 'paneSearch')) showTab(savedUi.tab);
 
   S.onChange(function (key) {
-    if (key === K.passage || key === K.bg || key === K.custom || key === null) renderPreview();
-    if (key === K.custom || key === null) syncCustomPanel();
+    if (key === K.passage || key === K.bg || key === K.bgImage || key === K.bgImages || key === K.custom || key === null) pv.render();
+    if (key === K.bg || key === K.bgImage || key === K.bgImages || key === null) panel.renderBackground();
+    if (key === K.custom || key === null) panel.sync();
     if (key === K.theme || key === null) renderThemeButton();
   });
 
+  // tells the projector window which styling to use (Bible or hymnal); re-claimed when this window gets focus
   S.setRaw(K.contentType, 'bible');
-  buildCustomPanel();
-  syncCustomPanel();
+  window.addEventListener('focus', function () { if (S.getRaw(K.contentType) !== 'bible') S.setRaw(K.contentType, 'bible'); });
+  panel.sync();
   renderThemeButton();
   renderBooks();
   renderChapters();
   renderVersionButtons();
   renderVerses();
-  renderPreview();
+  pv.render();
   renderResults();
 })();

@@ -1,0 +1,97 @@
+﻿SBVC STATIC - UPDATE LOG
+========================
+Every change to this folder is recorded here, newest at the BOTTOM.
+Format:  DATE | TIME | TYPE | DESCRIPTION
+Types:   NEW = something added, CHANGE = behavior changed, FIX = bug fixed, REMOVE = something removed
+(Times of the first entries are taken from the files' saved times, so they are approximate.)
+
+DATE        TIME   TYPE    DESCRIPTION
+----------  -----  ------  ---------------------------------------------------------------------------
+2026-11-24  05:50  NEW     Created this folder (SBVC_static) as a plain HTML / CSS / JavaScript copy of the
+                           Next.js SBVC project. The original project was NOT touched.
+2026-11-24  05:50  NEW     Bible data converted from JSON to JavaScript files: data/bible/{kjv,adb,tcb}/<book>.js
+                           (198 files, same text). Hymn data: data/hymns/hymns-english.js (308 hymns) and
+                           hymns-tagalog.js (79 hymns). Book names and chapter counts: data/books.js.
+2026-11-24  05:51  NEW     START.bat and tools/serve.ps1 - small local web server on port 8765
+                           (open http://localhost:8765/controller.html after starting it).
+2026-11-24  05:53  NEW     Controller page (controller.html + js/controller.js): book / chapter / verse lists,
+                           English (KJV) and Tagalog (ADB1905, TCB2015) columns, live preview with draggable
+                           title and text, show / clear / theme / reset-position / fullscreen buttons,
+                           customization panel (fonts, sizes, colors, alignment, padding), Bible search and notepad.
+2026-11-24  05:53  NEW     Presentation page (present.html + js/present.js): clean projector screen that updates
+                           by itself when the controller changes something.
+2026-11-24  05:54  NEW     Home page (index.html), About page (about.html), Preaching placeholder ("Soon") and
+                           Hymnals placeholder (hymnals.html). Shared style: css/style.css. Shared code: js/state.js, js/nav.js.
+2026-11-24  05:55  FIX     Search results: clicking a result now jumps to that verse (the original called a
+                           function that did not exist). The verse is outlined, not projected; click it to show it.
+2026-11-24  05:55  CHANGE  Theme button now switches the screen between black and white background immediately.
+2026-11-24  05:55  NEW     Notepad text is now remembered between sessions.
+2026-11-24  05:56  FIX     Opening a new chapter now starts at the top of the verse list.
+2026-11-24  06:09  CHANGE  Blank presentation screen now says "Show Bible Verse Controller"
+                           (was "Sabbath School and Bible Study").
+2026-11-24  06:09  CHANGE  Presentation screen: text can no longer be selected, copied, dragged or right-clicked
+                           by the audience. (Double-click and the F key still switch to fullscreen.)
+2026-11-24  06:12  CHANGE  A verse that is on the screen now STAYS when you click a different book or chapter.
+                           It only changes when a new verse is clicked, or when the Clear (X) button is pressed.
+2026-11-24  06:16  CHANGE  Text Alignment buttons in the controller now show icons (left, center, right, justify) instead of words.
+2026-11-24  06:22  NEW     Hymnals page (hymnals.html + js/hymnals.js): search 308 English and 79 Tagalog hymns, add up to 15 to a
+                           Preset (remembered), show the title or a single verse on the screen, background colors,
+                           own customization panel (separate from the Bible page), and a Video tab to drop in video or
+                           audio files, preview them, and play them with sound while the projector shows the picture.
+2026-11-24  06:22  NEW     Presentation window now switches to the hymnal styling when the Hymnals page is in use, and shows
+                           video (kept in step with the controller's player). Focus on a page re-selects its styling.
+2026-11-24  06:22  CHANGE  Preview and customization panel moved into shared files (js/preview.js, js/custompanel.js) so the
+                           Bible page and Hymnals page use the same code. Bible page behaves the same as before.
+2026-11-24  06:22  NEW     Added a Black choice to the hymnal background colors (the original had no way back to black).
+2026-11-24  06:22  CHANGE  Media list is not remembered after the page is reloaded (video files cannot be kept that way); add the files again.
+2026-11-24  06:25  CHANGE  Hymnals page: the right panel (preview, buttons, customization) now has the same size and layout as the
+                           Bible controller panel (350 px wide, same spacing and Customization title bar).
+2026-11-24  06:28  NEW     Hymnals background: a + button lets you add your own picture (up to 6, shrunk to screen size and
+                           remembered). Click a picture to use it on the projector, click a color to go back, and use
+                           the small x on a picture to remove it. Pictures apply to the Hymnals page only.
+2026-11-24  06:32  NEW     Bible controller: new Background category in the Customization panel - pick a background color or add
+                           your own picture with the + tile (same pictures as the Hymnals page; up to 6, remembered).
+2026-11-24  06:32  CHANGE  The chosen background now STAYS when you click a verse (before, every verse click reset it to black/white).
+                           The sun/moon button still switches to plain black or white and removes any picture.
+2026-11-24  06:32  CHANGE  Background colors and pictures are now shared by the Bible and Hymnals pages and always shown on the
+                           projector (shared code in js/background.js).
+2026-11-24  06:37  NEW     Bible controller: when you click a verse, the same verse in the OTHER translation scrolls into view
+                           and is marked with a soft blue bar, so you never have to scroll to find it. Works from
+                           English to Tagalog and the other way round, and when you switch ADB1905 / TCB2015.
+2026-11-24  06:37  FIX     Scrolling to a verse or book now moves only that list, never the whole page (the top menu could
+                           slide out of view before). App pages no longer scroll as a whole.
+2026-11-24  06:42  FIX     Hymnals > Video: the video now shows on the presentation window even when the pages are opened straight
+                           from the folder (file:///...). Before, the presentation window stayed blank because a browser
+                           will not let one window use a video link made by another. The controller now leaves the video
+                           file in the browser's storage (IndexedDB) and the presentation window reads it from there.
+                           The stored copy is deleted when you clear the screen, pick a hymn, or remove the video.
+2026-11-24  06:48  NEW     Your work is now kept when you refresh or close the tab:
+                           - Hymnals: the Media Library (video and audio files with thumbnails) is saved in browser storage
+                             and comes back after a refresh; removing a file removes the saved copy. Also remembered:
+                             search text, the open tab (Hymnal / Video), the selected hymn and the highlighted verse.
+                           - Bible controller: the Tagalog version (ADB1905 / TCB2015), the highlighted verse, the search
+                             box text and the open tab (Controls / Search).
+                           Already kept before: book and chapter, preset hymns, styling, background, pictures, notepad.
+2026-11-24  06:48  CHANGE  Replaces the earlier note that the media list is not remembered after a reload.
+
+2026-11-24  07:01  NEW FEATURE  Preaching page (PowerPoint-style): slide list with drag-to-reorder thumbnails, big main slide, + Text / + Verse boxes you can move, resize and type in, Duplicate/Delete slide, Format tab (font, size, color, bold/italic, alignment, line spacing, position, front/back, slide background colors + pictures, apply to all slides), and a Bible tab (quick reference like John 3:16-18, version/book/chapter/verses) to put verses straight on a slide or make a new slide with it. Present/Clear/Fullscreen buttons; the projector follows the slide you are on while LIVE. Saved on refresh.
+2026-11-24  07:01  CHANGE  present.html now shows Preaching slides (new js/slide.js); background picker can now save pictures for other pages (js/background.js).
+
+2026-11-24  07:07  CHANGE  Preaching: you now edit directly on the slide. One click on a box and you can type in it (verse text and reference too). A small bar floats above the selected box with font, size - / +, colors, bold, italic, alignment and delete. Drag the blue tab to move a box, the corner square to resize it. Click the empty area to deselect. The Format tab on the right is still there for exact position and slide background.
+
+2026-11-24  07:14  NEW FEATURE  Preaching slide list: Shift + click picks a range of slides, Ctrl + click adds or removes one (Ctrl+A picks all). Ctrl+C copies the picked slides (or the one you are on), Ctrl+V pastes them after it, Ctrl+X cuts, Ctrl+D duplicates, Delete removes them (asks first when more than one). The Duplicate and Delete buttons also work on all picked slides.
+
+2026-11-24  07:20  NEW FEATURE  Preaching design templates: new Design button (top of the slide) opens a gallery of 30 designs (Aa thumbnails with color dots, like PowerPoint). Click one to set the background (colors, gradients, stripes), heading font + color, body font + color and verse reference color. Choose to apply it to all slides, the picked slides, or this slide only. New slides and new boxes follow the last design chosen. Picking a plain background color or picture still works and replaces the design background.
+
+2026-11-24  07:24  NEW FEATURE  Preaching design COLORS: under the Design gallery there is now a Colors list (Office, Grayscale, Adjacency, Angles, Apex ... Grid - 21 color schemes with swatches). Pick one to recolor the chosen design (dark designs use the scheme's dark colors, light designs the light ones). Six color pickers (Background, Background 2, Heading, Body text, Accent, Accent 2) let you make your own colors, and a button goes back to the design's own colors. Works on all slides, picked slides or this slide only; new slides follow. Choosing a different design resets the colors to that design's own.
+
+2026-11-24  07:35  NEW FEATURE  Preaching shapes: new Shapes button (rectangle, rounded rectangle, oval, triangle, diamond, star, arrow, chevron, plus, heart, line). Move and resize like any box; the bar above the shape (and the Format tab) sets fill, outline color and thickness, opacity, front / back. Shapes on their automatic color follow the design's accent color.
+2026-11-24  07:35  NEW FEATURE  Preaching pictures: add with the Picture button, by dragging picture files onto the slide (drops where you let go), or by copying a picture and pressing Ctrl+V on the page. Pictures keep their shape when resized (hold Shift to stretch), have Fit to slide / Original shape / opacity / front / back, show on the projector, and are saved with the slides. Pictures no longer used are removed from storage automatically.
+
+2026-11-24  07:48  FIX  Preaching: the Tab key now works while typing in a text box (it adds an indent and keeps you in the box; Shift+Tab takes the indent back; also works in the Text field of the Format tab). Before, Tab jumped to the next button and ended the typing.
+2026-11-24  07:48  NEW FEATURE  Preaching: part of a text can now have its own style. Select some words in a box, then use the bar above it: size - / + (or type a number), font, color, bold, italic change ONLY the selected words. With nothing selected the change is for the whole box (and resets earlier part-changes of that kind). Pasting into a box now pastes plain text. Parts keep their style on the projector and after a refresh. A new design recolors parts too (their sizes stay).
+
+HOW TO ADD A NEW ENTRY
+----------------------
+Add one new line at the bottom with today's date, the time, a type, and a short description of what changed
+and why. Keep it in plain words.

@@ -4,13 +4,90 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SBVC - Hymnals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,700;1,7..72,400&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Ubuntu:wght@400;500;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="page">
-    <header id="topnav" class="topnav"></header>
-    <div class="centered"><h1>Hymnals - coming in the next step</h1></div>
+<div class="app">
+  <header id="topnav" class="topnav"></header>
+
+  <div class="main">
+    <!-- hymn lists (left) -->
+    <div class="col hym-left">
+      <input type="text" id="hSearch" placeholder="Search hymns...">
+      <div class="hym-lists">
+        <div class="col">
+          <h2 class="hym-h">English</h2>
+          <div class="scroll" id="listEn"></div>
+        </div>
+        <div class="col">
+          <h2 class="hym-h">Tagalog</h2>
+          <div class="scroll" id="listTl"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- preset + lyrics + media (center) -->
+    <div class="col hym-center">
+      <div class="tabs" id="hTabs" style="grid-template-columns:auto auto;justify-content:start;margin:0">
+        <button data-pane="paneHymnal" class="on">Hymnal</button>
+        <button data-pane="paneVideo">Video</button>
+      </div>
+
+      <div class="tabpane on" id="paneHymnal" style="padding-top:16px">
+        <div class="scroll" style="flex:1;padding-right:8px">
+          <h2 class="hym-title">Background</h2>
+          <div class="bgrow" id="bgRow"></div>
+          <hr class="sep" style="margin:16px 0">
+          <h2 class="hym-title">Preset</h2>
+          <div id="preset"></div>
+          <hr class="sep" style="margin:16px 0">
+          <div id="lyrics"></div>
+        </div>
+      </div>
+
+      <div class="tabpane" id="paneVideo" style="padding-top:16px">
+        <div class="dropzone" id="drop">
+          <div style="font-size:28px;opacity:.6">&#8679;</div>
+          <p class="muted" style="margin:8px 0 0">Drag &amp; drop files here, or click to select</p>
+          <input type="file" id="fileIn" multiple accept="video/*,audio/*" hidden>
+        </div>
+        <div class="scroll" style="flex:1;margin-top:16px">
+          <h3 style="margin:0 0 8px;font-size:18px">Media Library</h3>
+          <div id="media"></div>
+        </div>
+        <div id="nowPlaying"></div>
+      </div>
+    </div>
+
+    <!-- preview + customization (right) -->
+    <!-- same panel size and layout as the Bible controller (.side) -->
+    <div class="col side">
+      <div class="presentation">
+        <div class="preview" id="preview"></div>
+        <div class="btnrow" style="grid-template-columns:repeat(4,1fr)">
+          <button class="btn outline icon" id="bShow" title="Show screen (open presentation window)">&#9654;</button>
+          <button class="btn outline icon" id="bClear" title="Clear screen">&#10005;</button>
+          <button class="btn outline icon" id="bReset" title="Reset text positions">&#8635;</button>
+          <button class="btn outline icon" id="bFull" title="Fullscreen the presentation window (F)">&#9974;</button>
+        </div>
+      </div>
+      <div class="custom-title">Customization</div>
+      <div class="scroll" style="flex:1"><div class="custom" id="custom"></div></div>
+    </div>
   </div>
-  <script src="js/nav.js"></script>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="data/hymns/hymns-english.js"></script>
+<script src="data/hymns/hymns-tagalog.js"></script>
+<script src="js/state.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/background.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/custompanel.js"></script>
+<script src="js/hymnals.js"></script>
 </body>
 </html>
