@@ -1,7 +1,5 @@
 (window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/1kings"]=
-{
-   {
-  "1": {
+{"1": {
     "1": "Now king David was old and stricken in years; and they covered him with clothes, but he gat no heat.",
     "2": "Wherefore his servants said unto him, Let there be sought for my lord the king a young virgin: and let her stand before the king, and let her cherish him, and let her lie in thy bosom, that my lord the king may get heat.",
     "3": "So they sought for a fair damsel throughout all the coasts of Israel, and found Abishag a Shunammite, and brought her to the king.",
@@ -861,5 +859,4 @@
     "52": "And he did evil in the sight of the LORD, and walked in the way of his father, and in the way of his mother, and in the way of Jeroboam the son of Nebat, who made Israel to sin:",
     "53": "For he served Baal, and worshipped him, and provoked to anger the LORD God of Israel, according to all that his father had done."
   }
-}
-}
+};
