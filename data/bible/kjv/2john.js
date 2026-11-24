@@ -1,6 +1,5 @@
 (window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/2john"]=
-{"1":
-  "1": {
+{"1": {
     "1": "The elder unto the elect lady and her children, whom I love in the truth; and not I only, but also all they that have known the truth;",
     "2": "For the truth's sake, which dwelleth in us, and shall be with us for ever.",
     "3": "Grace be with you, mercy, and peace, from God the Father, and from the Lord Jesus Christ, the Son of the Father, in truth and love.",
@@ -14,5 +13,5 @@
     "11": "For he that biddeth him God speed is partaker of his evil deeds.",
     "12": "Having many things to write unto you, I would not write with paper and ink: but I trust to come unto you, and speak face to face, that our joy may be full.",
     "13": "The children of thy elect sister greet thee. Amen."
-  }
+}
 };
