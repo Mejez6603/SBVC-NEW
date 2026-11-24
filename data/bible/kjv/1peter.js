@@ -1,6 +1,5 @@
-(window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/1peter"]={
-    {
-  "1": {
+(window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/1peter"]=
+{"1": {
     "1": "Peter, an apostle of Jesus Christ, to the strangers scattered throughout Pontus, Galatia, Cappadocia, Asia, and Bithynia,",
     "2": "Elect according to the foreknowledge of God the Father, through sanctification of the Spirit, unto obedience and sprinkling of the blood of Jesus Christ: Grace unto you, and peace, be multiplied.",
     "3": "Blessed be the God and Father of our Lord Jesus Christ, which according to his abundant mercy hath begotten us again unto a lively hope by the resurrection of Jesus Christ from the dead,",
@@ -115,5 +114,4 @@
     "13": "The church that is at Babylon, elected together with you, saluteth you; and so doth Marcus my son.",
     "14": "Greet ye one another with a kiss of charity. Peace be with you all that are in Christ Jesus. Amen."
   }
-}
-}
+};
