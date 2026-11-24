@@ -1,5 +1,4 @@
 (window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/1samuel"]={
-    {
   "1": {
     "1": "Now there was a certain man of Ramathaimzophim, of mount Ephraim, and his name was Elkanah, the son of Jeroham, the son of Elihu, the son of Tohu, the son of Zuph, an Ephrathite:",
     "2": "And he had two wives; the name of the one was Hannah, and the name of the other Peninnah: and Peninnah had children, but Hannah had no children.",
@@ -872,5 +871,4 @@
     "12": "All the valiant men arose, and went all night, and took the body of Saul and the bodies of his sons from the wall of Bethshan, and came to Jabesh, and burnt them there.",
     "13": "And they took their bones, and buried them under a tree at Jabesh, and fasted seven days."
   }
-}
-}
+};
