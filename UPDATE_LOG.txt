@@ -104,7 +104,8 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 2026-11-25 2:38AM Update 1Peter.js on Brackets (Ronigan)
 2026-11-25 2:28AM Update 1samuel.js on Brackets (Ronigan)
 2026-11-25 3:24AM Update 1thessalonians.js, 1timothy.js, 2cronicles.js , 2john.js (Ronigan)
-2026-11-25 3:35 Update 2kings.js (Ronigan)
+2026-11-25 3:35AM Update 2kings.js (Ronigan)
+2026-11-25 3:52AM Update 2peter.js , 2samuel.js, 2thessalonians.js, 2timothy.js , 3john.js (Ronigan)
 
 HOW TO ADD A NEW ENTRY
 ----------------------
