@@ -1,6 +1,5 @@
-(window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/1corinthians"]={
-   {
-  "1": {
+(window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/1corinthians"]=
+{ "1":{
     "1": "Paul, called to be an apostle of Jesus Christ through the will of God, and Sosthenes our brother,",
     "2": "Unto the church of God which is at Corinth, to them that are sanctified in Christ Jesus, called to be saints, with all that in every place call upon the name of Jesus Christ our Lord, both their's and our's:",
     "3": "Grace be unto you, and peace, from God our Father, and from the Lord Jesus Christ.",
@@ -469,5 +468,5 @@
     "23": "The grace of our Lord Jesus Christ be with you.",
     "24": "My love be with you all in Christ Jesus. Amen."
   }
-}
 };
+
