@@ -89,7 +89,10 @@ DATE        TIME   TYPE    DESCRIPTION
 2026-11-24  07:35  NEW FEATURE  Preaching pictures: add with the Picture button, by dragging picture files onto the slide (drops where you let go), or by copying a picture and pressing Ctrl+V on the page. Pictures keep their shape when resized (hold Shift to stretch), have Fit to slide / Original shape / opacity / front / back, show on the projector, and are saved with the slides. Pictures no longer used are removed from storage automatically.
 
 2026-11-24  07:48  FIX  Preaching: the Tab key now works while typing in a text box (it adds an indent and keeps you in the box; Shift+Tab takes the indent back; also works in the Text field of the Format tab). Before, Tab jumped to the next button and ended the typing.
-2026-11-24  07:48  NEW FEATURE  Preaching: part of a text can now have its own style. Select some words in a box, then use the bar above it: size - / + (or type a number), font, color, bold, italic change ONLY the selected words. With nothing selected the change is for the whole box (and resets earlier part-changes of that kind). Pasting into a box now pastes plain text. Parts keep their style on the projector and after a refresh. A new design recolors parts too (their sizes stay).
+2026-11-24  07:48  NEW FEATURE  Preaching: part of a text can now have its own style. Select some words in a box, then use the bar above it: size - / + (or type a number), font, color, bold, italic change ONLY the selected words. With nothing selected the change is for the whole box (and resets earlier part-changes of that kind). Pasting into a box now pastes plain 
+text. Parts keep their style on the projector and after a refresh. A new design recolors parts too (their sizes stay).
+
+2026-11-24 2:33 pm Ronigan clone Repo
 
 HOW TO ADD A NEW ENTRY
 ----------------------
