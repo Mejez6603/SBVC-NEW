@@ -96,6 +96,7 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 2026-11-24 10:52PM Update the code on the 1corinthains.js,1john.js,1Kings.js,1Peter.js,1samuel.js (Ronigan)#
 2026-11-25 2:00AM 1chronicles.js is updated 
 
+2026-11-25 2:08AM Clod clone repo
 
 
 
