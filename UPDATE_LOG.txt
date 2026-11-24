@@ -99,9 +99,10 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 2026-11-25 2:08AM Clod clone repo
 2026-11-25 2:18AM Update TCB 1chronicles.js (Clod)
 2026-11-25 2:23AM Update 1corinthians.js(Ronigan)
-2026-11-25 2:28AM Update 1john.js (Ronigan)
-2026-11-25 2:35AM Update 1King.js (Ronigan)
-2026-11-25 2:38AM Update 1Peter.js (Ronigan)
+2026-11-25 2:28AM Update 1john.js on the Brackets(Ronigan)
+2026-11-25 2:35AM Update 1King.js on Brackets (Ronigan)
+2026-11-25 2:38AM Update 1Peter.js on Brackets (Ronigan)
+2026-11-25 2:28AM Update 1samuel.js on Brackets (Ronigan)
 
 HOW TO ADD A NEW ENTRY
 ----------------------
