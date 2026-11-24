@@ -470,4 +470,4 @@
     "24": "My love be with you all in Christ Jesus. Amen."
   }
 }
-}
+};
