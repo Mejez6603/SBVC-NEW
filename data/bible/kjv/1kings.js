@@ -859,4 +859,4 @@
     "52": "And he did evil in the sight of the LORD, and walked in the way of his father, and in the way of his mother, and in the way of Jeroboam the son of Nebat, who made Israel to sin:",
     "53": "For he served Baal, and worshipped him, and provoked to anger the LORD God of Israel, according to all that his father had done."
   }
-};
+  };
