@@ -1,7 +1,5 @@
 (window.SBVC_BIBLE=window.SBVC_BIBLE||{})["kjv/1chronicles"]=
-{
-    {
-  "1": {
+{"1": {
     "1": "Adam, Sheth, Enosh,",
     "2": "Kenan, Mahalaleel, Jered,",
     "3": "Henoch, Methuselah, Lamech,",
@@ -1001,5 +999,4 @@
     "29": "Now the acts of David the king, first and last, behold, they are written in the book of Samuel the seer, and in the book of Nathan the prophet, and in the book of Gad the seer,",
     "30": "With all his reign and his might, and the times that went over him, and over Israel, and over all the kingdoms of the countries."
   }
-}
-}
+};
