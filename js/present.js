@@ -7,8 +7,9 @@
 
   // Preaching: draw the live slide on a 1280x720 stage, scaled to fill the screen (letterboxed in the slide's own color)
   function renderPreaching() {
-    var deck = S.getJSON(K.preachDeck, null);
-    var idx = parseInt(S.getRaw(K.preachLive), 10);
+    var ppt = S.getRaw(K.contentType) === 'powerpoint'; // the PowerPoint page has its own slides
+    var deck = S.getJSON(ppt ? K.pptDeck : K.preachDeck, null);
+    var idx = parseInt(S.getRaw(ppt ? K.pptLive : K.preachLive), 10);
     var slide = deck && deck.slides && !isNaN(idx) ? deck.slides[idx] : null;
     screenEl.style.paddingLeft = screenEl.style.paddingRight = '0';
     screenEl.textContent = '';
@@ -36,8 +37,10 @@
     screenEl.appendChild(stage);
   }
 
+  function isSlides() { var c = S.getRaw(K.contentType); return c === 'preaching' || c === 'powerpoint'; }
+
   function render() {
-    if (S.getRaw(K.contentType) === 'preaching') { renderPreaching(); return; }
+    if (isSlides()) { renderPreaching(); return; }
     screenEl.style.position = '';
     var passage = S.getJSON(K.passage, null);
     var media = S.getJSON(K.activeMedia, null);
@@ -126,9 +129,9 @@
     if (key === K.playback) { syncMedia(); return; }
     if (key === K.passage || key === K.bg || key === K.custom || key === K.hymnCustom ||
         key === K.contentType || key === K.activeMedia || key === K.bgImage || key === K.bgCss || key === K.bgImages ||
-        key === K.preachDeck || key === K.preachLive || key === K.preachImages || key === null) render();
+        key === K.preachDeck || key === K.preachLive || key === K.pptDeck || key === K.pptLive || key === K.preachImages || key === null) render();
   });
-  window.addEventListener('resize', function () { if (S.getRaw(K.contentType) === 'preaching') renderPreaching(); });
+  window.addEventListener('resize', function () { if (isSlides()) renderPreaching(); });
 
   // The audience cannot select, copy, drag or right-click the text.
   ['selectstart', 'copy', 'cut', 'dragstart', 'contextmenu'].forEach(function (type) {

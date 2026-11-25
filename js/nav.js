@@ -4,6 +4,7 @@
     ['controller.html', 'SBVC'],
     ['hymnals.html', 'Hymnals'],
     ['preaching.html', 'Preaching'],
+    ['powerpoint.html', 'PowerPoint'],
     ['about.html', 'About']
   ];
   var here = location.pathname.split('/').pop() || 'index.html';

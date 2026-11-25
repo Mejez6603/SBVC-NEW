@@ -7,6 +7,10 @@
   var K = S.KEYS;
   var BK = window.SBVC_BOOKS;
   var W = S.STAGE_W, H = S.STAGE_H;
+  // The Preaching page and the PowerPoint page run this same editor, each with its own slides.
+  var DK = window.SBVC_DECK === 'powerpoint'
+    ? { deck: K.pptDeck, live: K.pptLive, other: K.preachDeck, type: 'powerpoint', clip: 'sbvc-powerpoint-clip', ns: 'ppt', title: 'Presentation Title' }
+    : { deck: K.preachDeck, live: K.preachLive, other: K.pptDeck, type: 'preaching', clip: 'sbvc-preaching-clip', ns: 'preach', title: 'Sermon Title' };
 
   var $ = function (id) { return document.getElementById(id); };
   function el(tag, cls, text) {
@@ -37,7 +41,7 @@
   function newSlide(withText) {
     var s = { id: uid(), bg: { color: '#000000', imageId: '' }, elements: [] };
     if (withText) {
-      s.elements.push(newTextEl('Sermon Title', 200, 150, 88, '#D4A373', true));
+      s.elements.push(newTextEl(DK.title, 200, 150, 88, '#D4A373', true));
       s.elements.push(newTextEl('Click here and type', 380, 120, 44, '#F5EBDD', false));
     }
     var th = currentTheme();
@@ -94,7 +98,7 @@
     return th ? themeElement(it, th) : it;
   }
 
-  var deck = S.getJSON(K.preachDeck, null);
+  var deck = S.getJSON(DK.deck, null);
   if (!deck || !Array.isArray(deck.slides) || !deck.slides.length) deck = { slides: [newSlide(true)], current: 0, tab: 'paneFormat' };
   deck.current = clamp(parseInt(deck.current, 10) || 0, 0, deck.slides.length - 1);
 
@@ -105,7 +109,7 @@
   var anchor = 0;         // where a Shift + click range starts
   var clip = [];          // slides copied with Ctrl+C / Ctrl+X
 
-  var liveRaw = S.getRaw(K.preachLive);
+  var liveRaw = S.getRaw(DK.live);
   if (liveRaw !== null && liveRaw !== '' && deck.slides[parseInt(liveRaw, 10)]) liveId = deck.slides[parseInt(liveRaw, 10)].id;
 
   function cur() { return deck.slides[deck.current]; }
@@ -119,7 +123,7 @@
   var saveTimer = null;
   function saveNow() {
     clearTimeout(saveTimer); saveTimer = null;
-    S.setJSON(K.preachDeck, deck);
+    S.setJSON(DK.deck, deck);
     recordHistory();
   }
   function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 150); }
@@ -159,7 +163,7 @@
     picked = {};
     if (!curEl()) selId = null;
     lastSnap = s; lastChange = 0;
-    S.setJSON(K.preachDeck, deck); // saved without making a new history step
+    S.setJSON(DK.deck, deck); // saved without making a new history step
     updateUndoButtons();
     pushLive(); drawSlideList(); drawCanvas(); buildFormat();
   }
@@ -186,7 +190,7 @@
   function pushLive() {
     var i = liveIndex();
     if (i < 0) liveId = null;
-    S.setRaw(K.preachLive, i < 0 ? null : String(i));
+    S.setRaw(DK.live, i < 0 ? null : String(i));
     $('liveBadge').hidden = i < 0;
     $('liveBadge').textContent = '● LIVE: slide ' + (i + 1);
     $('tShow').innerHTML = i < 0 ? '&#9654; Present' : '&#9654; Show this slide';
@@ -794,7 +798,7 @@
     return c;
   }
   // The clipboard is kept in browser storage too, so copied slides / boxes can be pasted in another tab or after a refresh.
-  var CLIP_KEY = 'sbvc-preaching-clip';
+  var CLIP_KEY = DK.clip;
   var lastClipId = '';
   var CLIP_MARK = 'SBVC-CLIP:'; // written to the system clipboard on copy, so a picture copied earlier in another program is not pasted by mistake
   var clipEls = [];       // boxes / shapes / pictures copied with Ctrl+C while one was selected
@@ -985,7 +989,7 @@
     var oldList = fmtHost.querySelector('.clist'), keepList = oldList ? oldList.scrollTop : 0;
     var scroller = fmtHost.parentElement, keepPanel = scroller ? scroller.scrollTop : 0;
     buildFormatInner();
-    S.makeCollapsible(fmtHost, 'preach-format'); // each section opens / closes
+    S.makeCollapsible(fmtHost, DK.ns + '-format'); // each section opens / closes
     var newList = fmtHost.querySelector('.clist');
     if (newList) newList.scrollTop = keepList;
     if (scroller) scroller.scrollTop = keepPanel;
@@ -1380,7 +1384,7 @@
     bibHost.appendChild(el('div', 'pnote', 'The verse box keeps its own text, so you can still edit, resize or restyle it on the slide.'));
 
     loadBible(false).then(function () {
-      var ui = S.getJSON(K.preachDeck, {}).bible;
+      var ui = S.getJSON(DK.deck, {}).bible;
       if (ui) { /* (reserved) */ }
     });
   }
@@ -1418,7 +1422,7 @@
   // It only changes when you press "Show this slide", double-click a slide, or use the Screen arrows / Alt + Left / Right.
   var presentWin = null;
   function goLive(i) {
-    S.setRaw(K.contentType, 'preaching');
+    S.setRaw(K.contentType, DK.type);
     var wasLive = liveId !== null;
     liveId = deck.slides[i].id;
     pushLive();
@@ -1710,7 +1714,9 @@
     if (!ids.length) return;
     var used = {};
     function scan(s) { s.elements.forEach(function (e) { if (e.imageId) used[e.imageId] = true; }); }
-    deck.slides.forEach(scan); clip.forEach(scan); clipEls.forEach(function (e) { if (e.imageId) used[e.imageId] = true; });
+    deck.slides.forEach(scan); clip.forEach(scan);
+    var od = S.getJSON(DK.other, null); // the other deck shares this picture store: keep its pictures
+    if (od && Array.isArray(od.slides)) od.slides.forEach(scan); clipEls.forEach(function (e) { if (e.imageId) used[e.imageId] = true; });
     var sc = readClip(); // what is on the clipboard (maybe copied in another tab)
     if (sc) sc.items.forEach(function (x) { if (sc.kind === 'slides') scan(x); else if (x.imageId) used[x.imageId] = true; });
     var drop = ids.filter(function (i) { // a picture stays while an undo / redo step can still bring it back
@@ -1956,12 +1962,12 @@
   /* ------------------------------------------------------------------ *
    * Start
    * ------------------------------------------------------------------ */
-  S.setRaw(K.contentType, 'preaching');
-  window.addEventListener('focus', function () { if (S.getRaw(K.contentType) !== 'preaching') S.setRaw(K.contentType, 'preaching'); });
+  S.setRaw(K.contentType, DK.type);
+  window.addEventListener('focus', function () { if (S.getRaw(K.contentType) !== DK.type) S.setRaw(K.contentType, DK.type); });
 
   pruneImages();
   buildBible();
-  S.makeCollapsible(bibHost, 'preach-bible');
+  S.makeCollapsible(bibHost, DK.ns + '-bible');
   drawSlideList();
   fit();
   drawCanvas();

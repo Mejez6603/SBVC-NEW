@@ -25,7 +25,9 @@
     ctrlUi: 'sbvc-controller-ui', // what you had open on the Bible controller (version, verse, search, tab)
     preachDeck: 'sbvc-preaching-deck', // the Preaching slides {slides:[...], current, tab}
     preachLive: 'sbvc-preaching-live', // index of the slide on the projector, or empty
-    preachImages: 'sbvc-preaching-images' // pictures placed on Preaching slides {imageId: small data URL}
+    preachImages: 'sbvc-preaching-images', // pictures placed on Preaching and PowerPoint slides {imageId: small data URL}
+    pptDeck: 'sbvc-powerpoint-deck', // the PowerPoint page's own slides {slides:[...], current, tab}
+    pptLive: 'sbvc-powerpoint-live' // index of the PowerPoint slide on the projector, or empty
   };
 
   var DEFAULT_CUSTOM = {
