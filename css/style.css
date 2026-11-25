@@ -330,3 +330,11 @@ body:has(> .app), body:has(> .page) { overflow: hidden; }
 .fbar .fb-label { font-size: 11px; color: var(--muted-foreground); padding: 0 2px; }
 .fbar .fb-num { min-width: 18px; text-align: center; font-size: 12px; }
 .sl-el img { user-select: none; -webkit-user-drag: none; }
+
+/* search results: per-page + pager */
+.rtop { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 2px 8px; font-size: 12px; }
+.rpp { display: inline-flex; align-items: center; gap: 6px; color: var(--muted-foreground); white-space: nowrap; }
+.rpp input, .pgmid input { width: 46px !important; padding: 3px 4px; text-align: center; font-size: 12px; }
+.pager { gap: 4px; }
+.pgmid { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.pager .btn.sm { padding: 0 6px; }

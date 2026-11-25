@@ -1,4 +1,4 @@
-﻿SBVC STATIC - UPDATE LOG
+SBVC STATIC - UPDATE LOG
 ========================
 Every change to this folder is recorded here, newest at the BOTTOM.
 Format:  DATE | TIME | TYPE | DESCRIPTION
@@ -106,6 +106,10 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 2026-11-25 3:24AM Update 1thessalonians.js, 1timothy.js, 2cronicles.js , 2john.js (Ronigan)
 2026-11-25 3:35AM Update 2kings.js (Ronigan)
 2026-11-25 3:52AM Update 2peter.js , 2samuel.js, 2thessalonians.js, 2timothy.js , 3john.js (Ronigan)
+
+2026-11-25  13:28  CHANGE  Bible controller > Search: results are now shown a page at a time so the browser uses less memory (before, up to 1000 results were drawn at once). New 'Per page' box (1 to 50, default 20, remembered), and a pager with first / previous / page number you can type / next / last, plus a '21-40 of 2720' counter. Changing 'Per page' keeps the first result you were looking at on screen. Each version tab (KJV / ADB / TCB) keeps its own page.
+
+2026-11-25  13:32  CHANGE  Project moved to the GitHub folder SBVC-NEW: the Bible search paging (css/style.css, js/controller.js) was merged in from SBVC_static. The Bible data files were NOT overwritten (the newer edited ones in SBVC-NEW were kept).
 
 HOW TO ADD A NEW ENTRY
 ----------------------

@@ -262,7 +262,11 @@
   var searchPage = { kjv: 1, adb: 1, tcb: 1 };
   var searching = false;
   var lastQuery = '';
-  var ITEMS_PER_PAGE = 1000;
+  var PER_PAGE_KEY = 'sbvc-search-perpage';
+  var MAX_PER_PAGE = 50;
+  var perPage = 20; // results drawn at once, 1-50 (kept between visits)
+  try { var pv = parseInt(localStorage.getItem(PER_PAGE_KEY), 10); if (pv >= 1 && pv <= 50) perPage = pv; } catch (e) {}
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
   function loadAllBooks(onProgress) {
     var jobs = [], done = 0;
@@ -348,9 +352,35 @@
     host.appendChild(tabs);
 
     var list = searchResults[searchTab];
-    var pages = Math.max(1, Math.ceil(list.length / ITEMS_PER_PAGE));
-    var page = Math.min(searchPage[searchTab], pages);
-    var slice = list.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+    var pages = Math.max(1, Math.ceil(list.length / perPage));
+    var page = clamp(searchPage[searchTab], 1, pages);
+    searchPage[searchTab] = page;
+    var from = (page - 1) * perPage;
+    var slice = list.slice(from, from + perPage);
+
+    // how many results to draw at once (1-50): fewer = lighter on memory
+    var top = el('div', 'rtop');
+    top.appendChild(el('span', 'muted', (from + 1) + '–' + (from + slice.length) + ' of ' + list.length));
+    var pp = el('label', 'rpp');
+    pp.appendChild(document.createTextNode('Per page '));
+    var ppIn = el('input'); ppIn.type = 'text'; ppIn.inputMode = 'numeric'; ppIn.value = perPage; ppIn.title = 'Results shown at once (1 to 50)';
+    function applyPerPage() {
+      var v = parseInt(ppIn.value, 10);
+      if (isNaN(v)) { ppIn.value = perPage; return; }
+      v = clamp(v, 1, MAX_PER_PAGE);
+      if (v !== perPage) {
+        // keep the first result you were looking at on screen
+        ['kjv', 'adb', 'tcb'].forEach(function (t) { searchPage[t] = Math.floor(((searchPage[t] - 1) * perPage) / v) + 1; });
+        perPage = v;
+        try { localStorage.setItem(PER_PAGE_KEY, String(v)); } catch (e) {}
+      }
+      renderResults();
+    }
+    ppIn.onchange = applyPerPage;
+    ppIn.onkeydown = function (e) { if (e.key === 'Enter') applyPerPage(); };
+    pp.appendChild(ppIn);
+    top.appendChild(pp);
+    host.appendChild(top);
 
     var box = el('div', 'resbox scroll');
     var re = new RegExp('(' + escapeHtml(lastQuery).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'gi');
@@ -368,15 +398,28 @@
     box.appendChild(frag);
     host.appendChild(box);
 
-    if (pages > 1) {
-      var pager = el('div', 'pager');
-      var prev = el('button', 'btn sm outline', 'Previous'); prev.disabled = page === 1;
-      var next = el('button', 'btn sm outline', 'Next'); next.disabled = page === pages;
-      prev.onclick = function () { searchPage[searchTab] = page - 1; renderResults(); };
-      next.onclick = function () { searchPage[searchTab] = page + 1; renderResults(); };
-      pager.appendChild(prev); pager.appendChild(el('span', '', 'Page ' + page + ' of ' + pages)); pager.appendChild(next);
-      host.appendChild(pager);
+    // pager: first / previous / page number / next / last
+    var pager = el('div', 'pager');
+    function go(p) { searchPage[searchTab] = clamp(p, 1, pages); renderResults(); }
+    function pbtn(label, title, target, off) {
+      var b = el('button', 'btn sm outline', label); b.title = title; b.disabled = off;
+      b.onclick = function () { go(target); };
+      return b;
     }
+    pager.appendChild(pbtn('«', 'First page', 1, page === 1));
+    pager.appendChild(pbtn('Previous', 'Previous page', page - 1, page === 1));
+    var mid = el('span', 'pgmid');
+    mid.appendChild(document.createTextNode('Page '));
+    var pgIn = el('input'); pgIn.type = 'text'; pgIn.inputMode = 'numeric'; pgIn.value = page; pgIn.title = 'Type a page number and press Enter';
+    function applyPage() { var v = parseInt(pgIn.value, 10); if (isNaN(v)) { pgIn.value = page; return; } go(v); }
+    pgIn.onchange = applyPage;
+    pgIn.onkeydown = function (e) { if (e.key === 'Enter') applyPage(); };
+    mid.appendChild(pgIn);
+    mid.appendChild(document.createTextNode(' of ' + pages));
+    pager.appendChild(mid);
+    pager.appendChild(pbtn('Next', 'Next page', page + 1, page === pages));
+    pager.appendChild(pbtn('»', 'Last page', pages, page === pages));
+    host.appendChild(pager);
   }
 
   $('qGo').onclick = runSearch;
