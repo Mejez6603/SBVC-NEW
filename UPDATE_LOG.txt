@@ -175,6 +175,7 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 2026-11-25 17:06 Update TCB 1samuel.js (Clod)
 2026-11-25 17:08 Update TCB 1thessalonians.js (Clod)
 2026-11-25 17:11 Update TCB 1timothy.js (Clod)
+2026-11-25 6:37PM Update kjv amos.js , colossains.js , Deuteronomy.js, Daniel.js, ecclesiastes.js (Ronigan)
 
 
 HOW TO ADD A NEW ENTRY
