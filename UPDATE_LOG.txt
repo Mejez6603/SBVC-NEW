@@ -98,14 +98,14 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-25 2:08AM Clod clone repo
 2026-11-25 2:18AM Update TCB 1chronicles.js (Clod)
-2026-11-25 2:23AM Update 1corinthians.js(Ronigan)
+2026-11-25 2:23AM Update kjv 1corinthians.js(Ronigan)
 2026-11-25 2:28AM Update 1john.js on the Brackets(Ronigan)
-2026-11-25 2:35AM Update 1King.js on Brackets (Ronigan)
-2026-11-25 2:38AM Update 1Peter.js on Brackets (Ronigan)
-2026-11-25 2:28AM Update 1samuel.js on Brackets (Ronigan)
-2026-11-25 3:24AM Update 1thessalonians.js, 1timothy.js, 2cronicles.js , 2john.js (Ronigan)
-2026-11-25 3:35AM Update 2kings.js (Ronigan)
-2026-11-25 3:52AM Update 2peter.js , 2samuel.js, 2thessalonians.js, 2timothy.js , 3john.js (Ronigan)
+2026-11-25 2:35AM Update kjv 1King.js on Brackets (Ronigan)
+2026-11-25 2:38AM Update kjv 1Peter.js on Brackets (Ronigan)
+2026-11-25 2:28AM Update kjv 1samuel.js on Brackets (Ronigan)
+2026-11-25 3:24AM Update kjv 1thessalonians.js, 1timothy.js, 2cronicles.js , 2john.js (Ronigan)
+2026-11-25 3:35AM Update kjv  2kings.js (Ronigan)
+2026-11-25 3:52AM Update kjv  2peter.js , 2samuel.js, 2thessalonians.js, 2timothy.js , 3john.js (Ronigan)
 
 2026-11-25  13:28  CHANGE  Bible controller > Search: results are now shown a page at a time so the browser uses less memory (before, up to 1000 results were drawn at once). New 'Per page' box (1 to 50, default 20, remembered), and a pager with first / previous / page number you can type / next / last, plus a '21-40 of 2720' counter. Changing 'Per page' keeps the first result you were looking at on screen. Each version tab (KJV / ADB / TCB) keeps its own page.
 
@@ -165,7 +165,7 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 <<<<<<< HEAD
 =======
-2026-11-25 6:12PM Update acts.js (Ronigan)
+2026-11-25 6:12PM Update  kjv acts.js (Ronigan)
 2026-11-25 16:52 Update TCB 1chronicles.js (Clod)
 2026-11-25 16:52 Update TCB 1chronicles.js (Clod)
 2026-11-25 16:56 Update TCB 1corinthians.js (Clod)
