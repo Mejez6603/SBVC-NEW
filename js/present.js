@@ -43,7 +43,9 @@
     if (isSlides()) { renderPreaching(); return; }
     screenEl.style.position = '';
     var passage = S.getJSON(K.passage, null);
-    var media = S.getJSON(K.activeMedia, null);
+    var media = S.getRaw(K.contentType) === 'hymnal' ? S.getJSON(K.activeMedia, null) : null;
+    // the same video is already playing: leave it alone
+    if (media && video && video.parentNode === screenEl && video.dataset.id === String(media.id)) { syncMedia(); return; }
     // the Hymnals page has its own styling, separate from the Bible page
     var customKey = S.getRaw(K.contentType) === 'hymnal' ? K.hymnCustom : K.custom;
     var c = S.getCustom(customKey);
@@ -56,6 +58,7 @@
     if (media) {
       var v = document.createElement('video');
       video = v;
+      v.dataset.id = String(media.id);
       v.muted = true;        // the sound plays from the controller computer
       v.playsInline = true;
       v.style.cssText = 'width:100%;height:100%;object-fit:cover';
@@ -127,10 +130,26 @@
   S.onChange(function (key) {
     if (key === K.fullscreen) { goFullscreen(); return; }
     if (key === K.playback) { syncMedia(); return; }
-    if (key === K.passage || key === K.bg || key === K.custom || key === K.hymnCustom ||
-        key === K.contentType || key === K.activeMedia || key === K.bgImage || key === K.bgCss || key === K.bgImages ||
-        key === K.preachDeck || key === K.preachLive || key === K.pptDeck || key === K.pptLive || key === K.preachImages || key === null) render();
+    if (key === K.contentType || key === null) { queueRender(); return; }
+    if (onScreen(key)) queueRender();
   });
+
+  // Work on other pages (editing slides, choosing styles...) must not disturb what is on the screen
+  function onScreen(key) {
+    var c = S.getRaw(K.contentType) || 'bible';
+    if (key === K.bgImages) return true;
+    if (c === 'preaching') return key === K.preachDeck || key === K.preachLive || key === K.preachImages;
+    if (c === 'powerpoint') return key === K.pptDeck || key === K.pptLive || key === K.preachImages;
+    if (key === K.bg || key === K.bgImage || key === K.bgCss || key === K.passage) return true;
+    if (c === 'hymnal') return key === K.hymnCustom || key === K.activeMedia;
+    return key === K.custom;
+  }
+  var queued = false;
+  function queueRender() { // several keys often change together: draw once, after all of them
+    if (queued) return;
+    queued = true;
+    setTimeout(function () { queued = false; render(); }, 0);
+  }
   window.addEventListener('resize', function () { if (isSlides()) renderPreaching(); });
 
   // The audience cannot select, copy, drag or right-click the text.

@@ -178,6 +178,8 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 2026-11-25 6:37PM Update kjv amos.js , colossains.js , Deuteronomy.js, Daniel.js, ecclesiastes.js (Ronigan)
 2026-11-26 1:07AM Update kjv ephesisans.js, esther.js , exodus.js, ezekiel.js, ezra.js, galatains.js, genesis.js, Habakkuk.js, hanggai.js (Ronigan)
 
+2026-11-26  09:30  FIX  The projector now keeps what it is showing when you open or switch between the Bible, Hymnals, Preaching and PowerPoint pages; it only changes when you click a verse, a hymn line, a video or Present a slide (or press Clear). Picking or removing a hymn no longer blanks the screen, a playing video is no longer stopped by opening Hymnals, editing on another page does not redraw the screen, and every preview screen shows what is really on the projector. Live mode helpers no longer change the screen just by joining (js/present.js, js/preview.js, js/controller.js, js/hymnals.js, js/preaching.js, js/live.js, 4 html pages)
+
 HOW TO ADD A NEW ENTRY
 ----------------------
 Add one new line at the bottom with today's date, the time, a type, and a short description of what changed

@@ -63,7 +63,12 @@
   }
 
   function theme() { return S.getTheme(); }
-  function setPassage(p) { S.setJSON(K.passage, p); }
+  // Only clicking a verse (or Clear) takes over the projector; opening or switching to this page does not
+  function setPassage(p) {
+    S.setJSON(K.activeMedia, null);
+    S.setJSON(K.passage, p);
+    S.setRaw(K.contentType, 'bible');
+  }
 
   function selectBook(book) {
     sel.book = book; sel.chapter = 1; sel.verse = null; sel.version = null; sel.focus = null;
@@ -220,7 +225,7 @@
   }
 
   // Shared widgets: live preview and customization panel (see js/preview.js, js/custompanel.js)
-  var pv = S.createPreview($('preview'), { customKey: K.custom, media: false, bgImage: true });
+  var pv = S.createPreview($('preview'), { customKey: K.custom });
   var panel = S.createCustomPanel($('custom'), K.custom, { background: true });
   S.makeCollapsible($('custom'), 'bible-custom'); // Title / Text / Layout / Background open and close
   S.createDesignPanel($('designHost'), { stateKey: K.bibleDesign, customKey: K.custom, name: 'bible-design', titleLabel: 'Verse reference', textLabel: 'Verse text' });
@@ -448,15 +453,11 @@
   if (savedUi && (savedUi.tab === 'paneMain' || savedUi.tab === 'paneSearch')) showTab(savedUi.tab);
 
   S.onChange(function (key) {
-    if (key === K.passage || key === K.bg || key === K.bgImage || key === K.bgImages || key === K.bgCss || key === K.custom || key === null) pv.render();
     if (key === K.bg || key === K.bgImage || key === K.bgCss || key === K.bgImages || key === null) panel.renderBackground();
     if (key === K.custom || key === null) panel.sync();
     if (key === K.theme || key === null) renderThemeButton();
   });
 
-  // tells the projector window which styling to use (Bible or hymnal); re-claimed when this window gets focus
-  S.setRaw(K.contentType, 'bible');
-  window.addEventListener('focus', function () { if (S.getRaw(K.contentType) !== 'bible') S.setRaw(K.contentType, 'bible'); });
   panel.sync();
   renderThemeButton();
   renderBooks();

@@ -367,20 +367,19 @@
     render();
   }
   function applySnapshot(d) {
-    var mine = S.getRaw(K.contentType), changed = 0;
+    var changed = 0;
     Object.keys(d).forEach(function (k) {
-      if (!syncable(k) || k === K.contentType) return;
+      if (!syncable(k)) return;
       if (!validate(k, d[k])) return;
       last[k] = d[k];
       if (S.getRaw(k) !== d[k]) { S.applyRemote(k, d[k]); changed++; }
     });
     allKeys().forEach(function (k) {
-      if (k === K.contentType || d[k] !== undefined) return;
+      if (d[k] !== undefined) return;
       last[k] = null; S.applyRemote(k, null); changed++;
     });
     ready = true;
     setStatus('guest', 'Connected as: ' + ROLES[myRole] + '.');
-    if (mine && myRole !== 'view') send({ t: 'set', k: K.contentType, v: mine }); // the page the helper has open is what the screen shows
     if (changed) {
       var t = 0; try { t = parseInt(sessionStorage.getItem('sbvc-live-reloaded'), 10) || 0; } catch (e) { /* none */ }
       if (Date.now() - t > 4000) {

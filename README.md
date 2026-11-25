@@ -22,6 +22,7 @@ SBVC is the static (plain web files) version of an earlier Next.js project.
 - **Import / Export** – save a deck as an `.sbvc.json` file, or export / import a real **PowerPoint (`.pptx`)** file (best effort: text, shapes, pictures and backgrounds come across; animations, charts, SmartArt, videos and gradient-filled shapes do not).
 - **Live mode** – share a deck with a key so a helper can join remotely and edit or control it (peer-to-peer over WebRTC). Includes host approval, view / control / edit roles, host controls, a restore point, an activity log and a **live chat** (text, pictures and small files).
 - **Remembers your work** – slides, notes and settings survive a refresh or closing the tab.
+- **The screen stays put** – switching between the Bible, Hymnals, Preaching and PowerPoint pages does not change the projector; it changes only when you click a new verse, hymn line, video or slide (or press Clear).
 - **Safe projector screen** – text on the presentation window cannot be selected, dragged or right-clicked.
 
 ## Technologies Used

@@ -193,6 +193,12 @@
     var i = liveIndex();
     if (i < 0) liveId = null;
     S.setRaw(DK.live, i < 0 ? null : String(i));
+    paintStatus();
+  }
+  // the slide that is really on the projector (-1 when another page's content is showing)
+  function screenIndex() { return S.getRaw(K.contentType) === DK.type ? liveIndex() : -1; }
+  function paintStatus() {
+    var i = screenIndex();
     $('liveBadge').hidden = i < 0;
     $('liveBadge').textContent = '● LIVE: slide ' + (i + 1);
     $('tShow').innerHTML = i < 0 ? '&#9654; Present' : '&#9654; Show this slide';
@@ -626,9 +632,7 @@
     S.renderSlide(st, deck.slides[i]);
     var w = t.querySelector('.tbox').clientWidth || 160;
     st.style.transform = 'scale(' + (w / W) + ')';
-    var li = liveIndex();
     paintPv(i);
-    if (i === liveIndex()) paintLive();
   }
   // Presenter View tab: every slide, 2 per row; click one to put it on the screen
   var pvNodes = [];
@@ -641,32 +645,17 @@
     S.renderSlide(st, deck.slides[i]);
     st.style.transform = 'scale(' + sc + ')';
   }
-  // the preview screen at the top of the right panel: what is on the projector right now
-  var liveBox = $('pvLive'), refreshing = false;
-  function paintLive() {
-    var i = liveIndex(), slide = i >= 0 ? deck.slides[i] : null;
-    liveBox.textContent = '';
-    liveBox.style.backgroundImage = 'none';
-    if (!slide) {
-      liveBox.style.backgroundColor = '#000000';
-      var no = el('div', 'none', 'No content selected');
-      liveBox.appendChild(no);
-      return;
-    }
-    liveBox.style.backgroundColor = (slide.bg && slide.bg.color) || '#000000';
-    var sc = (liveBox.clientWidth || 318) / W, st = el('div');
-    S.renderSlide(st, slide);
-    st.style.position = 'absolute'; st.style.left = '0'; st.style.top = '0'; st.style.transformOrigin = '0 0';
-    st.style.transform = 'scale(' + sc + ')'; st.style.pointerEvents = 'none';
-    liveBox.appendChild(st);
-  }
-  if (window.ResizeObserver) new ResizeObserver(function () { paintLive(); }).observe(liveBox);
+  // the preview screen at the top of the right panel: what is on the projector right now (js/preview.js)
+  var refreshing = false;
+  var screenPreview = S.createPreview($('pvLive'), {});
+  screenPreview.render();
   $('bvShow').onclick = function () { goLive(deck.current); };
-  $('bvClear').onclick = function () { liveId = null; pushLive(); };
-  $('bvRefresh').onclick = function () { var i = liveIndex(); if (i < 0) { paintLive(); return; } refreshing = true; S.setRaw(DK.live, null); setTimeout(function () { refreshing = false; pushLive(); }, 80); };
+  function clearScreen() { liveId = null; pushLive(); S.setRaw(K.contentType, DK.type); } // blank projector
+  $('bvClear').onclick = clearScreen;
+  $('bvRefresh').onclick = function () { var i = screenIndex(); if (i < 0) { screenPreview.render(); return; } refreshing = true; S.setRaw(DK.live, null); setTimeout(function () { refreshing = false; pushLive(); }, 80); };
   $('bvFull').onclick = function () { S.setRaw(K.fullscreen, String(Date.now())); };
   function drawPresenter() { // rebuild when the slides changed, otherwise only update the live mark
-    var grid = $('pvGrid'), li = liveIndex();
+    var grid = $('pvGrid'), li = screenIndex();
     var same = pvNodes.length === deck.slides.length && pvNodes.every(function (n, i) { return n.dataset.id === deck.slides[i].id; });
     if (!same) {
       grid.textContent = '';
@@ -685,12 +674,11 @@
       });
       pvNodes.forEach(function (n, i) { paintPv(i); });
     }
-    paintLive();
     pvNodes.forEach(function (n, i) { n.classList.toggle('islive', i === li); });
     $('pvNote').textContent = li < 0 ? 'Nothing is on the screen. Click a slide to show it.' : 'On screen: slide ' + (li + 1) + (deck.slides[li + 1] ? '. Next: slide ' + (li + 2) + '.' : ' (the last slide).') + ' Click any slide to show it.';
   }
   function drawThumbDots() {
-    var li = liveIndex();
+    var li = screenIndex();
     thumbNodes.forEach(function (t, i) {
       var d = t.querySelector('.livedot');
       if (d) d.hidden = i !== li;
@@ -1450,14 +1438,14 @@
   // It only changes when you press "Show this slide", double-click a slide, or use the Screen arrows / Alt + Left / Right.
   var presentWin = null;
   function goLive(i) {
-    S.setRaw(K.contentType, DK.type);
     var wasLive = liveId !== null;
     liveId = deck.slides[i].id;
     pushLive();
+    S.setRaw(K.contentType, DK.type); // only now does this page take over the projector
     if (!wasLive || (presentWin && presentWin.closed)) presentWin = window.open('present.html', 'present');
   }
   function liveStep(d) { // move only the screen
-    var i = liveIndex();
+    var i = screenIndex();
     if (i < 0) return;
     var j = clamp(i + d, 0, deck.slides.length - 1);
     if (j === i) return;
@@ -1468,7 +1456,7 @@
   window.addEventListener('resize', function () { if ($('paneView').classList.contains('on')) pvNodes.forEach(function (n, i) { paintPv(i); }); });
   $('tUndo').onclick = undo;
   $('tRedo').onclick = redo;
-  $('tClear').onclick = function () { liveId = null; pushLive(); };
+  $('tClear').onclick = clearScreen;
   $('tFull').onclick = function () { S.setRaw(K.fullscreen, String(Date.now())); };
 
   document.addEventListener('keydown', function (e) {
@@ -1538,6 +1526,7 @@
 
   S.onChange(function (key) {
     if (key === K.bgImages) { drawCanvas(); drawSlideList(); if (!curEl()) buildFormat(); }
+    if (key === K.contentType) paintStatus(); // another page took (or gave back) the projector
     // Live mode: a helper on another computer changed the slides or the slide on the screen
     if (key === DK.deck) {
       var raw = S.getRaw(DK.deck);
@@ -2162,9 +2151,7 @@
   /* ------------------------------------------------------------------ *
    * Start
    * ------------------------------------------------------------------ */
-  S.setRaw(K.contentType, DK.type);
-  window.addEventListener('focus', function () { if (S.getRaw(K.contentType) !== DK.type) S.setRaw(K.contentType, DK.type); });
-
+  // opening or switching to this page does not change the projector: only presenting a slide (or Clear) does
   pruneImages();
   buildBible();
   S.makeCollapsible(bibHost, DK.ns + '-bible');

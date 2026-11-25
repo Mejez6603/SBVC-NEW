@@ -28,6 +28,9 @@
 
   function sameHymn(a, b) { return a.number === b.number && a.title === b.title; }
   function setPassage(p) { S.setJSON(K.passage, p); }
+  // Only clicking lyrics or a video (or Clear) takes over the projector; opening or switching to this page does not
+  function takeScreen() { S.setRaw(K.contentType, 'hymnal'); }
+  function hymnOnScreen() { return S.getRaw(K.contentType) === 'hymnal'; }
 
   // remember what is open so a refresh or a closed tab brings you back to the same place
   function saveUi() {
@@ -98,7 +101,6 @@
     S.setJSON(K.preset, presetList);
     if (state.hymn && sameHymn(state.hymn, h)) {
       state.hymn = null; state.verseIndex = null;
-      setPassage(null);
     }
     renderPreset(); renderLyrics(); saveUi();
   }
@@ -126,11 +128,8 @@
 
   function selectHymn(h) {
     state.hymn = h;
-    state.verseIndex = null;
-    S.setJSON(K.activeMedia, null); S.mediaStore.clear();
-    S.setJSON(K.playback, null);
-    setPassage(null);
-    renderPreset(); renderLyrics(); renderNowPlaying(); renderMedia(); saveUi();
+    state.verseIndex = null; // the screen stays as it is until you click a line of this hymn
+    renderPreset(); renderLyrics(); saveUi();
   }
 
   function groupLyrics(lyrics) {
@@ -151,6 +150,7 @@
       reference: index === -1 ? state.hymn.title : '',
       text: index === -1 ? '' : lines.join('\n')
     });
+    takeScreen();
     renderLyrics(); renderNowPlaying(); renderMedia(); saveUi();
   }
 
@@ -248,7 +248,6 @@
   function selectMedia(file) {
     var token = ++mediaToken;
     state.hymn = null; state.verseIndex = null;
-    setPassage(null);
     renderPreset(); renderLyrics(); saveUi();
     var meta = { id: Date.now().toString(36), name: file.name, url: file.url, type: file.type };
 
@@ -256,6 +255,8 @@
       if (token !== mediaToken) return; // another video was picked in the meantime
       S.setJSON(K.playback, { isPlaying: true, currentTime: 0, timestamp: Date.now() });
       S.setJSON(K.activeMedia, meta);
+      takeScreen();
+      setPassage(null);
       renderMedia(); renderNowPlaying();
     }
     // First leave the file where the presentation window can read it (see SBVC.mediaStore), then announce it.
@@ -310,24 +311,34 @@
     var host = $('nowPlaying');
     var am = activeMedia();
     host.textContent = '';
-    if (!am) return;
+    if (!am || !state.library.some(function (f) { return f.url === am.url; })) return;
     host.className = 'nowplaying';
     host.appendChild(el('h3', '', 'Now Playing'));
     var v = document.createElement('video');
-    v.controls = true; v.autoplay = true; v.src = am.url;
+    v.controls = true; v.src = am.url;
     v.className = 'nowvideo';
     // this player is the "master": the projector copies what it does
     function publish() {
       S.setJSON(K.playback, { isPlaying: !v.paused, currentTime: v.currentTime, timestamp: Date.now() });
     }
-    ['play', 'pause', 'seeked', 'timeupdate'].forEach(function (t) { v.addEventListener(t, publish); });
+    // First jump to where the video already is (you may be coming back to this page). It only starts leading
+    // once it really plays or you touch it, so a browser that blocks autoplay cannot pause the projector.
+    var leading = false;
+    function lead() {
+      if (leading) return;
+      leading = true;
+      ['play', 'pause', 'seeked', 'timeupdate'].forEach(function (t) { v.addEventListener(t, publish); });
+    }
+    v.addEventListener('playing', lead);
+    v.addEventListener('pointerdown', lead);
+    v.addEventListener('loadedmetadata', function () { S.syncVideo(v); });
     host.appendChild(v);
   }
 
   /* ------------------------------------------------------------------ *
    * Right: preview, buttons, customization
    * ------------------------------------------------------------------ */
-  var pv = S.createPreview($('preview'), { customKey: K.hymnCustom, media: true, bgImage: true });
+  var pv = S.createPreview($('preview'), { customKey: K.hymnCustom });
   var panel = S.createCustomPanel($('custom'), K.hymnCustom);
   S.makeCollapsible($('custom'), 'hymn-custom');
   S.createDesignPanel($('designHost'), { stateKey: K.hymnDesign, customKey: K.hymnCustom, name: 'hymn-design', titleLabel: 'Hymn title', textLabel: 'Lyrics' }); // Title / Text / Layout / Background open and close
@@ -366,23 +377,17 @@
   }
 
   S.onChange(function (key) {
-    if (key === K.playback) { pv.syncMedia(); return; }
-    if (key === K.passage || key === K.bg || key === K.hymnCustom || key === K.activeMedia ||
-        key === K.bgImage || key === K.bgCss || key === K.bgImages || key === null) pv.render();
+    if (key === K.playback) return;
+    if (key === K.activeMedia || key === null) { renderMedia(); if (!activeMedia()) renderNowPlaying(); } // stopped from another page
+    if (key === K.contentType && !hymnOnScreen() && state.verseIndex !== null) {
+      state.verseIndex = null; renderLyrics(); saveUi(); // another page took the screen
+    }
     if (key === K.hymnCustom || key === null) panel.sync();
     if (key === K.bg || key === K.bgImage || key === K.bgCss || key === K.bgImages || key === null) bgp.render();
     if (key === K.passage && !S.getJSON(K.passage, null) && state.verseIndex !== null) {
       state.verseIndex = null; renderLyrics(); saveUi(); // cleared from another window
     }
   });
-
-  // Media from an earlier visit points at files that no longer exist: drop it.
-  S.setJSON(K.activeMedia, null); S.mediaStore.clear();
-  S.setJSON(K.playback, null);
-
-  // tells the projector window to use the hymnal styling; re-claimed when this window gets focus
-  S.setRaw(K.contentType, 'hymnal');
-  window.addEventListener('focus', function () { if (S.getRaw(K.contentType) !== 'hymnal') S.setRaw(K.contentType, 'hymnal'); });
 
   // ---- bring back what was open before the refresh / closed tab ----
   var ui = S.getJSON(K.hymnUi, null);
@@ -394,7 +399,7 @@
       if (found) {
         state.hymn = found;
         // the highlighted verse only comes back if it is still what the screen shows
-        if (typeof ui.verseIndex === 'number' && S.getJSON(K.passage, null)) state.verseIndex = ui.verseIndex;
+        if (typeof ui.verseIndex === 'number' && hymnOnScreen() && S.getJSON(K.passage, null)) state.verseIndex = ui.verseIndex;
       }
     }
   }
@@ -417,6 +422,12 @@
       if (have[r.id] || !r.file) return;
       state.library.push({ id: r.id, added: r.added, name: r.name, type: r.type, thumbnail: r.thumbnail, file: r.file, url: URL.createObjectURL(r.file) });
     });
+    // a video that is still selected gets this page's own link to its file, so you can control it again
+    var am = activeMedia();
+    if (am) {
+      var same = state.library.filter(function (f) { return f.name === am.name && f.type === am.type; })[0];
+      if (same) { am.url = same.url; S.setJSON(K.activeMedia, am); renderNowPlaying(); }
+    }
     renderMedia();
   }).catch(function (e) { console.error('Could not read the saved media library', e); });
 })();
