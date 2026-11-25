@@ -111,6 +111,14 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-25  13:32  CHANGE  Project moved to the GitHub folder SBVC-NEW: the Bible search paging (css/style.css, js/controller.js) was merged in from SBVC_static. The Bible data files were NOT overwritten (the newer edited ones in SBVC-NEW were kept).
 
+2026-11-25  13:39  NEW FEATURE  Hymnals: Design templates and Colors, the same 30 designs and 21 color schemes as the Preaching page (plus your own color pickers), at the top of the right-hand panel. A design sets the screen background (color, gradient or bands) and the hymn title and lyrics fonts and colors; sizes, spacing and alignment stay as you set them. Picking a plain background color or picture afterwards replaces the design background. The designs now live in one shared file, js/designs.js, used by both pages (new: js/designs.js, js/hymndesign.js).
+
+2026-11-25  13:39  FIX  Bible controller: the new search-paging code accidentally reused the name 'pv' and broke the live preview box on the controller page (console error 'pv.render is not a function'). Renamed, preview works again.
+
+2026-11-25  13:42  CHANGE  Hymnals right panel: every section (Design, Colors, Title, Text, Layout) now has a small arrow button on its heading to minimize or expand it. Click the heading or the arrow; which sections you closed is remembered. (New helper SBVC.makeCollapsible in js/custompanel.js.)
+
+2026-11-25  13:46  NEW FEATURE  Bible controller: the same Design (30 designs) and Colors (21 schemes + your own pickers) as Hymnals/Preaching, at the top of the right panel, and every section (Design, Colors, Title, Text, Layout, Background) can be minimized/expanded with its arrow. A design sets the screen background and the verse reference / verse text fonts and colors; sizes and alignment stay. The screen background is shared between the Bible and Hymnals pages, so a design's background shows on both (their fonts/colors stay separate). The design panel code is now js/designpanel.js (was js/hymndesign.js).
+
 HOW TO ADD A NEW ENTRY
 ----------------------
 Add one new line at the bottom with today's date, the time, a type, and a short description of what changed

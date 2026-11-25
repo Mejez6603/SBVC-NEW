@@ -222,6 +222,8 @@
   // Shared widgets: live preview and customization panel (see js/preview.js, js/custompanel.js)
   var pv = S.createPreview($('preview'), { customKey: K.custom, media: false, bgImage: true });
   var panel = S.createCustomPanel($('custom'), K.custom, { background: true });
+  S.makeCollapsible($('custom'), 'bible-custom'); // Title / Text / Layout / Background open and close
+  S.createDesignPanel($('designHost'), { stateKey: K.bibleDesign, customKey: K.custom, name: 'bible-design', titleLabel: 'Verse reference', textLabel: 'Verse text' });
 
   /* ------------------------------------------------------------------ *
    * Control buttons
@@ -242,6 +244,7 @@
     S.setRaw(K.theme, next);
     // the screen background follows the theme right away (the original only did this on the next verse)
     S.setRaw(K.bgImage, null);
+    S.setRaw(K.bgCss, null);
     S.setRaw(K.bg, S.bgForTheme(next));
     renderThemeButton();
   };
@@ -265,7 +268,7 @@
   var PER_PAGE_KEY = 'sbvc-search-perpage';
   var MAX_PER_PAGE = 50;
   var perPage = 20; // results drawn at once, 1-50 (kept between visits)
-  try { var pv = parseInt(localStorage.getItem(PER_PAGE_KEY), 10); if (pv >= 1 && pv <= 50) perPage = pv; } catch (e) {}
+  try { var savedPP = parseInt(localStorage.getItem(PER_PAGE_KEY), 10); if (savedPP >= 1 && savedPP <= 50) perPage = savedPP; } catch (e) {}
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
   function loadAllBooks(onProgress) {
@@ -445,8 +448,8 @@
   if (savedUi && (savedUi.tab === 'paneMain' || savedUi.tab === 'paneSearch')) showTab(savedUi.tab);
 
   S.onChange(function (key) {
-    if (key === K.passage || key === K.bg || key === K.bgImage || key === K.bgImages || key === K.custom || key === null) pv.render();
-    if (key === K.bg || key === K.bgImage || key === K.bgImages || key === null) panel.renderBackground();
+    if (key === K.passage || key === K.bg || key === K.bgImage || key === K.bgImages || key === K.bgCss || key === K.custom || key === null) pv.render();
+    if (key === K.bg || key === K.bgImage || key === K.bgCss || key === K.bgImages || key === null) panel.renderBackground();
     if (key === K.custom || key === null) panel.sync();
     if (key === K.theme || key === null) renderThemeButton();
   });

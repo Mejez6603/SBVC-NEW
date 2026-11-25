@@ -45,7 +45,7 @@
     var customKey = S.getRaw(K.contentType) === 'hymnal' ? K.hymnCustom : K.custom;
     var c = S.getCustom(customKey);
     // background color, or your own picture if one is chosen
-    S.applyBackground(screenEl, true);
+    S.applyBackground(screenEl, true, true);
     screenEl.style.paddingLeft = screenEl.style.paddingRight = c.horizontalPadding + 'rem';
     screenEl.textContent = '';
     video = null;
@@ -125,7 +125,7 @@
     if (key === K.fullscreen) { goFullscreen(); return; }
     if (key === K.playback) { syncMedia(); return; }
     if (key === K.passage || key === K.bg || key === K.custom || key === K.hymnCustom ||
-        key === K.contentType || key === K.activeMedia || key === K.bgImage || key === K.bgImages ||
+        key === K.contentType || key === K.activeMedia || key === K.bgImage || key === K.bgCss || key === K.bgImages ||
         key === K.preachDeck || key === K.preachLive || key === K.preachImages || key === null) render();
   });
   window.addEventListener('resize', function () { if (S.getRaw(K.contentType) === 'preaching') renderPreaching(); });

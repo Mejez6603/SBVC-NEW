@@ -329,6 +329,8 @@
    * ------------------------------------------------------------------ */
   var pv = S.createPreview($('preview'), { customKey: K.hymnCustom, media: true, bgImage: true });
   var panel = S.createCustomPanel($('custom'), K.hymnCustom);
+  S.makeCollapsible($('custom'), 'hymn-custom');
+  S.createDesignPanel($('designHost'), { stateKey: K.hymnDesign, customKey: K.hymnCustom, name: 'hymn-design', titleLabel: 'Hymn title', textLabel: 'Lyrics' }); // Title / Text / Layout / Background open and close
 
   $('bShow').onclick = function () { window.open('present.html', 'present'); };
   $('bClear').onclick = function () {
@@ -366,9 +368,9 @@
   S.onChange(function (key) {
     if (key === K.playback) { pv.syncMedia(); return; }
     if (key === K.passage || key === K.bg || key === K.hymnCustom || key === K.activeMedia ||
-        key === K.bgImage || key === K.bgImages || key === null) pv.render();
+        key === K.bgImage || key === K.bgCss || key === K.bgImages || key === null) pv.render();
     if (key === K.hymnCustom || key === null) panel.sync();
-    if (key === K.bg || key === K.bgImage || key === K.bgImages || key === null) bgp.render();
+    if (key === K.bg || key === K.bgImage || key === K.bgCss || key === K.bgImages || key === null) bgp.render();
     if (key === K.passage && !S.getJSON(K.passage, null) && state.verseIndex !== null) {
       state.verseIndex = null; renderLyrics(); saveUi(); // cleared from another window
     }

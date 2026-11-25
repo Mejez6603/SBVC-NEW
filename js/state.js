@@ -18,6 +18,9 @@
     playback: 'sbvc-media-playback-state',
     bgImages: 'sbvc-bg-images',   // list of custom background pictures [{id, name, url}] (url = small JPEG data URL)
     bgImage: 'sbvc-bg-image',     // id of the picture in use, or empty
+    bgCss: 'sbvc-bg-css',         // background layers of a chosen Hymnals design (gradient / bands), or empty
+    hymnDesign: 'sbvc-hymnals-design', // the Hymnals design in use {theme, colorScheme, customColors}
+    bibleDesign: 'sbvc-bible-design', // the Bible controller design in use {theme, colorScheme, customColors}
     hymnUi: 'sbvc-hymnals-ui',    // what you had open on the Hymnals page (search, hymn, verse, tab)
     ctrlUi: 'sbvc-controller-ui', // what you had open on the Bible controller (version, verse, search, tab)
     preachDeck: 'sbvc-preaching-deck', // the Preaching slides {slides:[...], current, tab}
@@ -104,10 +107,11 @@
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i].url;
     return null;
   }
-  function applyBackground(node, useImage) {
+  function applyBackground(node, useImage, useDesign) {
     node.style.backgroundColor = getRaw(KEYS.bg) || '#000000';
     var url = useImage ? getBgImageUrl() : null;
-    node.style.backgroundImage = url ? 'url("' + url + '")' : 'none';
+    var css = useDesign ? getRaw(KEYS.bgCss) : null; // a Hymnals design's gradient / bands, drawn under a picture
+    node.style.backgroundImage = url ? 'url("' + url + '")' : (css || 'none');
     node.style.backgroundSize = 'cover';
     node.style.backgroundPosition = 'center';
     node.style.backgroundRepeat = 'no-repeat';

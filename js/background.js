@@ -84,7 +84,7 @@
   S.MAX_BG_IMAGES = MAX_IMAGES;
 
   function addImage(file) {
-    saveImage(file).then(function (entry) { S.setRaw(K.bgImage, entry.id); }).catch(function () { /* message already shown */ });
+    saveImage(file).then(function (entry) { S.setRaw(K.bgCss, null); S.setRaw(K.bgImage, entry.id); }).catch(function () { /* message already shown */ });
   }
 
   function removeImage(id) {
@@ -102,13 +102,14 @@
       host.textContent = '';
       var cur = (S.getRaw(K.bg) || '#000000').toLowerCase();
       var curImage = S.getRaw(K.bgImage) || '';
+      var curCss = S.getRaw(K.bgCss) || '';
 
       COLORS.forEach(function (b) {
-        var btn = el('button', 'bgbtn' + (!curImage && cur === b[1].toLowerCase() ? ' on' : ''));
+        var btn = el('button', 'bgbtn' + (!curImage && !curCss && cur === b[1].toLowerCase() ? ' on' : ''));
         btn.style.backgroundColor = b[1];
         btn.title = b[0];
         btn.setAttribute('aria-label', b[0]);
-        btn.onclick = function () { S.setRaw(K.bgImage, null); S.setRaw(K.bg, b[1]); };
+        btn.onclick = function () { S.setRaw(K.bgCss, null); S.setRaw(K.bgImage, null); S.setRaw(K.bg, b[1]); };
         host.appendChild(btn);
       });
 
@@ -118,7 +119,7 @@
         btn.style.backgroundImage = 'url("' + img.url + '")';
         btn.title = img.name;
         btn.setAttribute('aria-label', 'Background picture ' + img.name);
-        btn.onclick = function () { S.setRaw(K.bgImage, img.id); };
+        btn.onclick = function () { S.setRaw(K.bgCss, null); S.setRaw(K.bgImage, img.id); };
         var x = el('button', 'bgx', '✕');
         x.title = 'Remove this picture';
         x.setAttribute('aria-label', 'Remove picture ' + img.name);
