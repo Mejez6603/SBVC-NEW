@@ -156,6 +156,7 @@
    */
   function makeCollapsible(host, name) {
     var storeKey = 'sbvc-collapsed-' + name;
+    function keyOf(title) { return title.replace(/\d+/g, '#'); } // 'Slide 3 background' and 'Slide 4 background' are one section
     var closed = {};
     try { closed = JSON.parse(localStorage.getItem(storeKey)) || {}; } catch (e) { closed = {}; }
     function remember() { try { localStorage.setItem(storeKey, JSON.stringify(closed)); } catch (e) {} }
@@ -187,10 +188,11 @@
         h.setAttribute('aria-expanded', String(!isClosed));
         h.title = isClosed ? 'Expand ' + title : 'Minimize ' + title;
       }
-      function toggle() { closed[title] = !closed[title]; if (!closed[title]) delete closed[title]; remember(); show(!!closed[title]); }
+      var key = keyOf(title);
+      function toggle() { closed[key] = !closed[key]; if (!closed[key]) delete closed[key]; remember(); show(!!closed[key]); }
       h.onclick = toggle;
       h.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
-      show(!!closed[title]);
+      show(!!closed[key]);
     });
   }
 

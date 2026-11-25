@@ -119,9 +119,61 @@
   function saveNow() {
     clearTimeout(saveTimer); saveTimer = null;
     S.setJSON(K.preachDeck, deck);
+    recordHistory();
   }
   function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 150); }
   window.addEventListener('beforeunload', function () { if (saveTimer) saveNow(); });
+
+  /* ------------------------------------------------------------------ *
+   * Undo / redo for everything on the slides (Ctrl+Z / Ctrl+Y): text, moving and resizing, adding and deleting
+   * boxes and slides, designs and colors. Each saved change is remembered as a whole copy of the slides.
+   * Changes that come quickly one after another (typing, dragging) count as one step.
+   * ------------------------------------------------------------------ */
+  var MAX_UNDO = 50, BURST_MS = 800;
+  var undoStack = [], redoStack = [];
+  var lastChange = 0;
+  function snap() { return JSON.stringify({ slides: deck.slides, theme: deck.theme, colorScheme: deck.colorScheme, customColors: deck.customColors }); }
+  var lastSnap = snap();
+  function recordHistory() {
+    var s = snap();
+    if (s === lastSnap) return;
+    var now = Date.now();
+    if (!undoStack.length || now - lastChange > BURST_MS) {
+      undoStack.push(lastSnap);
+      if (undoStack.length > MAX_UNDO) undoStack.shift();
+    }
+    lastChange = now; lastSnap = s; redoStack = [];
+    updateUndoButtons();
+  }
+  function updateUndoButtons() {
+    var u = document.getElementById('tUndo'), r = document.getElementById('tRedo');
+    if (u) u.disabled = !undoStack.length;
+    if (r) r.disabled = !redoStack.length;
+  }
+  function applyState(s) {
+    if (endEdit) endEdit();
+    var o = JSON.parse(s);
+    deck.slides = o.slides; deck.theme = o.theme; deck.colorScheme = o.colorScheme; deck.customColors = o.customColors;
+    deck.current = clamp(deck.current, 0, deck.slides.length - 1);
+    picked = {};
+    if (!curEl()) selId = null;
+    lastSnap = s; lastChange = 0;
+    S.setJSON(K.preachDeck, deck); // saved without making a new history step
+    updateUndoButtons();
+    pushLive(); drawSlideList(); drawCanvas(); buildFormat();
+  }
+  function undo() {
+    if (saveTimer) saveNow();
+    if (!undoStack.length) { S.toast('Undo', 'Nothing more to undo.'); return; }
+    redoStack.push(lastSnap);
+    applyState(undoStack.pop());
+  }
+  function redo() {
+    if (saveTimer) saveNow();
+    if (!redoStack.length) { S.toast('Redo', 'Nothing to redo.'); return; }
+    undoStack.push(lastSnap);
+    applyState(redoStack.pop());
+  }
 
   function liveIndex() {
     if (!liveId) return -1;
@@ -165,16 +217,22 @@
     nodes = S.renderSlide(stage, cur());
     var sel = curEl();
     if (!sel) selId = null;
+    // while a box is selected (or being typed in) every box shows its own resize corner; with nothing selected there are none
+    cur().elements.forEach(function (it) {
+      if (!sel || !nodes[it.id]) return;
+      var rh = el('div', 'rh'); rh.dataset.id = it.id; rh.title = 'Drag to resize this box'; stage.appendChild(rh);
+      placeHandles(it);
+    });
     if (sel && nodes[sel.id]) {
       nodes[sel.id].classList.add('sel');
-      var rh = el('div', 'rh'); stage.appendChild(rh);
       var mh = el('div', 'mh', '✥'); mh.title = 'Drag to move this box'; stage.appendChild(mh);
       placeHandles(sel);
     }
     buildBar();
   }
+  function handleOf(id) { return stage.querySelector('.rh[data-id="' + String(id).replace(/"/g, '') + '"]'); }
   function placeHandles(it) {
-    var rh = stage.querySelector('.rh'), mh = stage.querySelector('.mh');
+    var rh = handleOf(it.id), mh = it.id === selId ? stage.querySelector('.mh') : null;
     if (rh) { rh.style.left = (it.x + it.w) + 'px'; rh.style.top = (it.y + it.h) + 'px'; }
     if (mh) { mh.style.left = it.x + 'px'; mh.style.top = it.y + 'px'; }
   }
@@ -195,7 +253,7 @@
       if (node && !handle && !mover && node.dataset.id === selId) return; // normal caret placement inside the box
       if (endEdit) endEdit();
     }
-    var id = node ? node.dataset.id : ((handle || mover) ? selId : null);
+    var id = node ? node.dataset.id : (handle ? handle.dataset.id : (mover ? selId : null));
     if (!id) { setSel(null); return; }
     var part = e.target.closest('.sl-ref') ? 'ref' : 'text';
     var was = selId === id;
@@ -365,7 +423,6 @@
     editing = true; editPart = part; curPart = part; savedRange = null;
     edit = { item: item, target: target, part: part };
     node.classList.add('editing');
-    var rh = stage.querySelector('.rh'); if (rh) rh.remove();
     if (part === 'ref') {
       try { target.contentEditable = 'plaintext-only'; } catch (x) {}
       if (target.contentEditable !== 'plaintext-only') target.contentEditable = 'true';
@@ -829,6 +886,16 @@
   }
 
   function buildFormat() {
+    // the panel is drawn again after every click: keep the color list and the panel where they were scrolled to
+    var oldList = fmtHost.querySelector('.clist'), keepList = oldList ? oldList.scrollTop : 0;
+    var scroller = fmtHost.parentElement, keepPanel = scroller ? scroller.scrollTop : 0;
+    buildFormatInner();
+    S.makeCollapsible(fmtHost, 'preach-format'); // each section opens / closes
+    var newList = fmtHost.querySelector('.clist');
+    if (newList) newList.scrollTop = keepList;
+    if (scroller) scroller.scrollTop = keepPanel;
+  }
+  function buildFormatInner() {
     if (editing) return;
     fmtHost.textContent = '';
     geomSync = null;
@@ -1257,10 +1324,22 @@
     pushLive();
     window.open('present.html', 'present');
   };
+  $('tUndo').onclick = undo;
+  $('tRedo').onclick = redo;
   $('tClear').onclick = function () { liveId = null; pushLive(); };
   $('tFull').onclick = function () { S.setRaw(K.fullscreen, String(Date.now())); };
 
   document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key.toLowerCase() === 'z' || e.key.toLowerCase() === 'y')) {
+      var tt = e.target;
+      // inside a text box / text field the browser undoes the typing itself; everywhere else the whole slides are undone
+      var inText = editing || (tt && (tt.isContentEditable || tt.tagName === 'TEXTAREA' || (tt.tagName === 'INPUT' && /^(text|number|search|)$/.test(tt.type || ''))));
+      if (!inText) {
+        e.preventDefault();
+        if (e.key.toLowerCase() === 'y' || e.shiftKey) redo(); else undo();
+      }
+      return;
+    }
     if (editing || e.altKey) return;
     var t = e.target;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
@@ -1498,7 +1577,12 @@
     var used = {};
     function scan(s) { s.elements.forEach(function (e) { if (e.imageId) used[e.imageId] = true; }); }
     deck.slides.forEach(scan); clip.forEach(scan);
-    var drop = ids.filter(function (i) { return !used[i]; });
+    var drop = ids.filter(function (i) { // a picture stays while an undo / redo step can still bring it back
+      if (used[i]) return false;
+      for (var u = 0; u < undoStack.length; u++) if (undoStack[u].indexOf(i) >= 0) return false;
+      for (var r = 0; r < redoStack.length; r++) if (redoStack[r].indexOf(i) >= 0) return false;
+      return true;
+    });
     if (!drop.length) return;
     var copy = Object.assign({}, map);
     drop.forEach(function (i) { delete copy[i]; });
@@ -1569,6 +1653,7 @@
 
   pruneImages();
   buildBible();
+  S.makeCollapsible(bibHost, 'preach-bible');
   drawSlideList();
   fit();
   drawCanvas();

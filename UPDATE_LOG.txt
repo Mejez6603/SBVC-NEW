@@ -119,6 +119,20 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-25  13:46  NEW FEATURE  Bible controller: the same Design (30 designs) and Colors (21 schemes + your own pickers) as Hymnals/Preaching, at the top of the right panel, and every section (Design, Colors, Title, Text, Layout, Background) can be minimized/expanded with its arrow. A design sets the screen background and the verse reference / verse text fonts and colors; sizes and alignment stay. The screen background is shared between the Bible and Hymnals pages, so a design's background shows on both (their fonts/colors stay separate). The design panel code is now js/designpanel.js (was js/hymndesign.js).
 
+2026-11-25  13:50  CHANGE  Preaching: every section of the Format panel (Design, Colors, Slide background, Text box, Position & size, Picture ...) and the Bible tab now has an arrow on its heading to minimize or expand it; closed sections are remembered. 'Slide 2 background' and 'Slide 3 background' count as the same section.
+
+2026-11-25  13:51  FIX  Design > Colors: the color boxes in 'Or make your own colors' now line up on one row even when a label (like 'Accent (verse reference)') wraps to two lines (css/style.css).
+
+2026-11-25  13:54  FIX  Design > Colors list (Preaching, Hymnals, Bible controller): choosing a color scheme further down the list (Black Tie, Foundry...) no longer jumps the list back to the top; the list and the panel stay where you scrolled.
+
+2026-11-25  13:58  CHANGE  Preaching: every box on the slide now shows its blue resize corner all the time, so you can resize any box without clicking it first (dragging the corner also selects that box). The move tab and outline still appear only on the selected box. The corner is hidden while you type in that box.
+
+2026-11-25  13:59  CHANGE  Preaching: the blue resize corner now stays visible while you type in a box too (before, it was hidden during typing). Dragging it while typing saves the text and resizes the box.
+
+2026-11-25  14:01  CHANGE  Preaching: the blue resize corners are hidden when no box is selected (a clean slide). As soon as a box is selected or being typed in, every box shows its resize corner.
+
+2026-11-25  14:04  NEW FEATURE  Preaching: overall Undo / Redo. Ctrl+Z undoes and Ctrl+Y (or Ctrl+Shift+Z) redoes the last change on the slides: typed text (even after you clicked away from the box), moving and resizing, adding or deleting boxes and slides, pasting, designs and colors. Quick changes in a row (typing, dragging) count as one step; up to 50 steps are kept. While you are typing inside a box, Ctrl+Z still undoes the typing itself, as before. New Undo / Redo buttons in the toolbar. Pictures stay in storage while an undo step can bring them back.
+
 HOW TO ADD A NEW ENTRY
 ----------------------
 Add one new line at the bottom with today's date, the time, a type, and a short description of what changed

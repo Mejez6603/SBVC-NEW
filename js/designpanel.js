@@ -60,6 +60,9 @@
   }
 
   function build() {
+    // the lists are drawn again after every click: keep them where they were scrolled to
+    var oldList = host.querySelector('.clist'), keepList = oldList ? oldList.scrollTop : 0;
+    var scroller = host.parentElement, keepPanel = scroller ? scroller.scrollTop : 0;
     host.textContent = '';
     host.appendChild(el('h4', '', 'Design'));
     var grid = el('div', 'dgrid');
@@ -118,6 +121,9 @@
     host.appendChild(reset);
     host.appendChild(el('hr', 'sep'));
     S.makeCollapsible(host, opts.name); // each section opens / closes
+    var newList = host.querySelector('.clist');
+    if (newList) newList.scrollTop = keepList;
+    if (scroller) scroller.scrollTop = keepPanel;
   }
 
   build();

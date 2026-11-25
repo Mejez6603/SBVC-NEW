@@ -344,3 +344,6 @@ body:has(> .app), body:has(> .page) { overflow: hidden; }
 .custom h4.collapsible .chev { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; border: 1px solid var(--border, #3a3f4b); border-radius: 6px; transition: transform .15s; }
 .custom h4.collapsible.closed .chev { transform: rotate(-90deg); }
 .sec-body[hidden] { display: none; }
+/* color pickers line up on one row even when a label wraps to two lines */
+.prow2 > .field:has(.cpick) { display: flex; flex-direction: column; justify-content: space-between; }
+.prow2 > .field:has(.cpick) .cpick { margin-top: auto; }
