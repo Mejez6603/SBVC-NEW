@@ -628,6 +628,7 @@
     st.style.transform = 'scale(' + (w / W) + ')';
     var li = liveIndex();
     paintPv(i);
+    if (i === liveIndex()) paintLive();
   }
   // Presenter View tab: every slide, 2 per row; click one to put it on the screen
   var pvNodes = [];
@@ -640,6 +641,30 @@
     S.renderSlide(st, deck.slides[i]);
     st.style.transform = 'scale(' + sc + ')';
   }
+  // the preview screen at the top of the right panel: what is on the projector right now
+  var liveBox = $('pvLive'), refreshing = false;
+  function paintLive() {
+    var i = liveIndex(), slide = i >= 0 ? deck.slides[i] : null;
+    liveBox.textContent = '';
+    liveBox.style.backgroundImage = 'none';
+    if (!slide) {
+      liveBox.style.backgroundColor = '#000000';
+      var no = el('div', 'none', 'No content selected');
+      liveBox.appendChild(no);
+      return;
+    }
+    liveBox.style.backgroundColor = (slide.bg && slide.bg.color) || '#000000';
+    var sc = (liveBox.clientWidth || 318) / W, st = el('div');
+    S.renderSlide(st, slide);
+    st.style.position = 'absolute'; st.style.left = '0'; st.style.top = '0'; st.style.transformOrigin = '0 0';
+    st.style.transform = 'scale(' + sc + ')'; st.style.pointerEvents = 'none';
+    liveBox.appendChild(st);
+  }
+  if (window.ResizeObserver) new ResizeObserver(function () { paintLive(); }).observe(liveBox);
+  $('bvShow').onclick = function () { goLive(deck.current); };
+  $('bvClear').onclick = function () { liveId = null; pushLive(); };
+  $('bvRefresh').onclick = function () { var i = liveIndex(); if (i < 0) { paintLive(); return; } refreshing = true; S.setRaw(DK.live, null); setTimeout(function () { refreshing = false; pushLive(); }, 80); };
+  $('bvFull').onclick = function () { S.setRaw(K.fullscreen, String(Date.now())); };
   function drawPresenter() { // rebuild when the slides changed, otherwise only update the live mark
     var grid = $('pvGrid'), li = liveIndex();
     var same = pvNodes.length === deck.slides.length && pvNodes.every(function (n, i) { return n.dataset.id === deck.slides[i].id; });
@@ -660,6 +685,7 @@
       });
       pvNodes.forEach(function (n, i) { paintPv(i); });
     }
+    paintLive();
     pvNodes.forEach(function (n, i) { n.classList.toggle('islive', i === li); });
     $('pvNote').textContent = li < 0 ? 'Nothing is on the screen. Click a slide to show it.' : 'On screen: slide ' + (li + 1) + (deck.slides[li + 1] ? '. Next: slide ' + (li + 2) + '.' : ' (the last slide).') + ' Click any slide to show it.';
   }
@@ -1527,7 +1553,7 @@
       picked = {}; selId = curEl() && keepSel && at >= 0 ? keepSel : null; if (!curEl()) selId = null;
       lastSnap = snap();
       pushLive(); drawSlideList(); drawCanvas(); buildFormat();
-    } else if (key === DK.live) {
+    } else if (key === DK.live && !refreshing) {
       var lr = S.getRaw(DK.live), li = liveIndex();
       if (lr !== (li < 0 ? null : String(li))) {
         var ix = lr === null || lr === '' ? NaN : parseInt(lr, 10);
@@ -1984,6 +2010,155 @@
     fbar.hidden = false; placeBar();
   }
 
+  /* ------------------------------------------------------------------ *
+   * Export / Import: save the slides to a file and bring them back (also useful as a backup or to move to another computer)
+   * ------------------------------------------------------------------ */
+  var IMP_IMG = /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+\/=]+$/;
+  var IMP_BAD = /javascript:|<\s*script|<\s*iframe|<\s*object|<\s*embed|expression\(|@import|url\(\s*(?!['"]?data:image\/(png|jpe?g|webp|gif))/i;
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+  function baseName() { return 'SBVC-' + (DK.type === 'powerpoint' ? 'PowerPoint' : 'Preaching') + '-' + new Date().toISOString().slice(0, 10); }
+  function exportPptxFile() {
+    if (saveTimer) saveNow();
+    if (!S.pptxExport) { S.toast('Not available', 'The PowerPoint export code did not load.'); return; }
+    S.toast('Exporting', 'Making the PowerPoint file...');
+    S.pptxExport(deck.slides, { images: S.preachImages(), bgImages: S.getJSON(K.bgImages, []) }).then(function (blob) {
+      var name = baseName() + '.pptx';
+      download(blob, name);
+      S.toast('Exported', deck.slides.length + ' slide(s) saved to ' + name + '.');
+    }).catch(function (e) { S.toast('Could not export', String((e && e.message) || e).slice(0, 120)); });
+  }
+  function askExport() {
+    var ov = el('div', 'impdlg'), box = el('div', 'impbox');
+    box.appendChild(el('b', '', 'Export ' + deck.slides.length + ' slide(s)'));
+    box.appendChild(el('p', '', 'PowerPoint opens in PowerPoint, Google Slides and others (gradient designs become a picture, fonts may change). The SBVC file keeps everything exactly as it is here.'));
+    var row = el('div', 'improw');
+    function b(label, cls, fn) { var x = el('button', 'btn sm ' + cls, label); x.type = 'button'; x.onclick = function () { ov.remove(); if (fn) fn(); }; row.appendChild(x); }
+    b('SBVC file (.sbvc.json)', 'outline', exportDeck);
+    b('PowerPoint (.pptx)', '', exportPptxFile);
+    b('Cancel', 'outline');
+    box.appendChild(row); ov.appendChild(box);
+    ov.addEventListener('mousedown', function (e) { if (e.target === ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+  function exportDeck() {
+    if (saveTimer) saveNow();
+    var used = {}, usedBg = {};
+    deck.slides.forEach(function (s) {
+      if (s.bg && s.bg.imageId) usedBg[s.bg.imageId] = 1;
+      s.elements.forEach(function (e) { if (e.imageId) used[e.imageId] = 1; });
+    });
+    var map = S.preachImages(), imgs = {};
+    Object.keys(used).forEach(function (i) { if (map[i]) imgs[i] = map[i]; });
+    var bgs = S.getJSON(K.bgImages, []).filter(function (b) { return usedBg[b.id]; });
+    var payload = { app: 'SBVC', kind: 'slides', source: DK.type, version: 1, exported: new Date().toISOString(),
+      slides: deck.slides, theme: deck.theme, colorScheme: deck.colorScheme, customColors: deck.customColors, images: imgs, backgrounds: bgs };
+    var blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'SBVC-' + (DK.type === 'powerpoint' ? 'PowerPoint' : 'Preaching') + '-' + new Date().toISOString().slice(0, 10) + '.sbvc.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    S.toast('Exported', deck.slides.length + ' slide(s) saved to ' + a.download + '.');
+  }
+  function checkImport(o) { // returns a problem text, or '' when the file is fine
+    if (!o || typeof o !== 'object' || o.app !== 'SBVC' || o.kind !== 'slides') return 'This is not an SBVC slides file.';
+    if (!Array.isArray(o.slides) || !o.slides.length) return 'The file has no slides.';
+    if (o.slides.length > 300) return 'Too many slides (limit 300).';
+    for (var i = 0; i < o.slides.length; i++) {
+      var s = o.slides[i];
+      if (!s || typeof s !== 'object' || !Array.isArray(s.elements) || s.elements.length > 200) return 'Slide ' + (i + 1) + ' is damaged.';
+      for (var j = 0; j < s.elements.length; j++) {
+        var e = s.elements[j];
+        if (!e || typeof e !== 'object' || ['x', 'y', 'w', 'h'].some(function (k) { return typeof e[k] !== 'number' || !isFinite(e[k]); })) return 'Slide ' + (i + 1) + ' has a damaged box.';
+      }
+    }
+    if (IMP_BAD.test(JSON.stringify(o.slides))) return 'The file contains something that is not allowed (scripts or outside web links).';
+    var im = o.images || {};
+    if (typeof im !== 'object' || Object.keys(im).length > 300 || Object.keys(im).some(function (k) { return typeof im[k] !== 'string' || !IMP_IMG.test(im[k]); })) return 'The pictures in the file are not allowed.';
+    var bg = o.backgrounds || [];
+    if (!Array.isArray(bg) || bg.length > 100 || bg.some(function (b) { return !b || typeof b.url !== 'string' || !IMP_IMG.test(b.url) || String(b.id || '').length > 60; })) return 'The background pictures in the file are not allowed.';
+    return '';
+  }
+  function applyImport(o, mode) {
+    var map = Object.assign({}, S.preachImages()), add = false;
+    Object.keys(o.images || {}).forEach(function (i) { if (!map[i]) { map[i] = o.images[i]; add = true; } });
+    if (add) {
+      var json = JSON.stringify(map);
+      S.setRaw(K.preachImages, json);
+      if (S.getRaw(K.preachImages) !== json) { S.toast('Not imported', 'Browser storage is full. Delete pictures or slides you do not need, then try again.'); return; }
+    }
+    var list = S.getJSON(K.bgImages, []);
+    (o.backgrounds || []).forEach(function (b) {
+      if (!list.some(function (x) { return x.id === b.id; }) && list.length < (S.MAX_BG_IMAGES || 100)) list.push({ id: String(b.id), name: String(b.name || 'Picture').slice(0, 60), url: b.url });
+    });
+    S.setJSON(K.bgImages, list);
+    var slides = o.slides.map(cloneSlide), n = slides.length;
+    if (mode === 'replace') {
+      deck.slides = slides;
+      if (typeof o.theme === 'string' && o.theme.length < 60) deck.theme = o.theme;
+      if (typeof o.colorScheme === 'string' && o.colorScheme.length < 60) deck.colorScheme = o.colorScheme;
+      if (o.customColors && typeof o.customColors === 'object' && !Array.isArray(o.customColors)) deck.customColors = o.customColors;
+      deck.current = 0; liveId = null;
+    } else {
+      deck.current = deck.slides.length;
+      deck.slides = deck.slides.concat(slides);
+    }
+    selId = null; picked = {}; anchor = deck.current;
+    saveNow(); pushLive(); drawSlideList(); drawCanvas(); buildFormat();
+    S.toast('Imported', n + ' slide(s) ' + (mode === 'replace' ? 'replace your slides (Ctrl+Z undoes it).' : 'added at the end.'));
+  }
+  function askImport(o, fileName) {
+    var ov = el('div', 'impdlg'), box = el('div', 'impbox');
+    box.appendChild(el('b', '', 'Import ' + o.slides.length + ' slide(s)'));
+    box.appendChild(el('p', '', fileName + ' (from ' + (o.source === 'pptx' ? 'a PowerPoint file' : o.source === 'powerpoint' ? 'the PowerPoint page' : 'the Preaching page') + ')'));
+    var row = el('div', 'improw');
+    function btn(label, cls, fn) { var b = el('button', 'btn sm ' + cls, label); b.type = 'button'; b.onclick = function () { ov.remove(); if (fn) fn(); }; row.appendChild(b); }
+    btn('Add after my slides', 'outline', function () { applyImport(o, 'add'); });
+    btn('Replace all my slides', '', function () { applyImport(o, 'replace'); });
+    btn('Cancel', 'outline');
+    box.appendChild(row); ov.appendChild(box);
+    ov.addEventListener('mousedown', function (e) { if (e.target === ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+  $('tExport').onclick = askExport;
+  function importPptxFile(f) {
+    if (!S.pptxImport) { S.toast('Not available', 'The PowerPoint import code did not load.'); return; }
+    S.toast('Importing', 'Reading the PowerPoint file...');
+    S.pptxImport(f).then(function (res) {
+      var o = { app: 'SBVC', kind: 'slides', source: 'pptx', slides: res.slides, images: res.images, backgrounds: [] };
+      if (!o.slides.length) { S.toast('Could not import', 'No slides were found in the file.'); return; }
+      var bad = checkImport(o);
+      if (bad) { S.toast('Could not import', bad); return; }
+      var n = res.notes || [], extra = [];
+      if (n.skippedPictures) extra.push(n.skippedPictures + ' picture(s) of an unsupported type were left out');
+      if (n.skippedObjects) extra.push(n.skippedObjects + ' chart/diagram object(s) were left out');
+      if (n.tables) extra.push(n.tables + ' table(s) became text');
+      if (n.cut) extra.push('only the first 300 of ' + n.cut + ' slides were read');
+      askImport(o, f.name);
+      if (extra.length) S.toast('Note', extra.join('; ') + '.');
+    }).catch(function (e) { S.toast('Could not import', String((e && e.message) || 'This is not a PowerPoint file.').slice(0, 140)); });
+  }
+  $('tImport').onclick = function () { $('impIn').click(); };
+  $('impIn').onchange = function () {
+    var f = $('impIn').files && $('impIn').files[0]; $('impIn').value = '';
+    if (!f) return;
+    if (f.size > 25000000) { S.toast('Too big', 'The file is larger than 25 MB.'); return; }
+    if (/\.pptx$/i.test(f.name)) { importPptxFile(f); return; }
+    var r = new FileReader();
+    r.onload = function () {
+      var o; try { o = JSON.parse(r.result); } catch (e) { S.toast('Could not import', 'This file is not an SBVC slides file.'); return; }
+      var bad = checkImport(o);
+      if (bad) { S.toast('Could not import', bad); return; }
+      askImport(o, f.name);
+    };
+    r.onerror = function () { S.toast('Could not import', 'The file could not be read.'); };
+    r.readAsText(f);
+  };
   /* ------------------------------------------------------------------ *
    * Start
    * ------------------------------------------------------------------ */
