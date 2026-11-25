@@ -65,6 +65,7 @@
   function themeElement(it, th) {
     if (it.type === 'image') return it;
     if (it.type === 'shape') { // shapes still on their automatic color follow the design's accent
+      if (it.style) { it.style.fontFamily = th.body.font; if (it.html) stripRich(it, ['font-family']); } // text inside follows the design font
       if (it.auto) {
         if (it.shape === 'line') it.stroke = th.accent;
         else { it.fill = th.accent; if (it.stroke) it.stroke = th.accent2 || th.accent; }
@@ -163,12 +164,14 @@
     pushLive(); drawSlideList(); drawCanvas(); buildFormat();
   }
   function undo() {
+    if (cropState) cancelCrop();
     if (saveTimer) saveNow();
     if (!undoStack.length) { S.toast('Undo', 'Nothing more to undo.'); return; }
     redoStack.push(lastSnap);
     applyState(undoStack.pop());
   }
   function redo() {
+    if (cropState) cancelCrop();
     if (saveTimer) saveNow();
     if (!redoStack.length) { S.toast('Redo', 'Nothing to redo.'); return; }
     undoStack.push(lastSnap);
@@ -185,6 +188,9 @@
     if (i < 0) liveId = null;
     S.setRaw(K.preachLive, i < 0 ? null : String(i));
     $('liveBadge').hidden = i < 0;
+    $('liveBadge').textContent = '● LIVE: slide ' + (i + 1);
+    $('tShow').innerHTML = i < 0 ? '&#9654; Present' : '&#9654; Show this slide';
+    drawPresenter();
     drawThumbDots();
   }
 
@@ -219,15 +225,16 @@
     if (!sel) selId = null;
     // while a box is selected (or being typed in) every box shows its own resize corner; with nothing selected there are none
     cur().elements.forEach(function (it) {
-      if (!sel || !nodes[it.id]) return;
+      if (!sel || !nodes[it.id] || cropState) return;
       var rh = el('div', 'rh'); rh.dataset.id = it.id; rh.title = 'Drag to resize this box'; stage.appendChild(rh);
       placeHandles(it);
     });
+    if (cropState && sel !== cropState.item) cropState = null; // the picture is gone
     if (sel && nodes[sel.id]) {
       nodes[sel.id].classList.add('sel');
-      var mh = el('div', 'mh', '✥'); mh.title = 'Drag to move this box'; stage.appendChild(mh);
-      placeHandles(sel);
+      if (!cropState) { var mh = el('div', 'mh', '✥'); mh.title = 'Drag to move this box'; stage.appendChild(mh); placeHandles(sel); }
     }
+    if (cropState) drawCropBox();
     buildBar();
   }
   function handleOf(id) { return stage.querySelector('.rh[data-id="' + String(id).replace(/"/g, '') + '"]'); }
@@ -239,14 +246,18 @@
 
   // ---- mouse: select / move / resize; a plain click starts typing ----
   var drag = null;
+  function shapeTextStyle() { return { fontFamily: 'Inter', fontSize: 40, color: 'auto', bold: false, italic: false, align: 'center', lineHeight: 1.25 }; }
+  function ensureShapeText(it) { if (it.type === 'shape' && it.shape !== 'line') { if (!it.style) it.style = shapeTextStyle(); if (it.text === undefined) it.text = ''; } return it; }
   function barStyle() { // the style object the floating bar edits
     var it = curEl();
     if (!it) return null;
+    ensureShapeText(it);
     if (it.type === 'verse' && curPart === 'ref') { it.refStyle = it.refStyle || { fontFamily: it.style.fontFamily, fontSize: 40, color: '#D4A373' }; return it.refStyle; }
     return it.style;
   }
 
   stage.addEventListener('pointerdown', function (e) {
+    if (cropState) { cropDown(e); return; }
     var handle = e.target.closest('.rh'), mover = e.target.closest('.mh');
     var node = e.target.closest('.sl-el');
     if (editing) {
@@ -263,11 +274,12 @@
     var item = curEl();
     if (!item) return;
     drag = { mode: handle ? 'resize' : 'move', sx: e.clientX, sy: e.clientY, ox: item.x, oy: item.y, ow: item.w, oh: item.h,
-      item: item, moved: false, grip: !!(handle || mover), part: part, id: id };
+      item: item, moved: false, grip: !!(handle || mover), part: part, id: id, was: was };
     stage.setPointerCapture(e.pointerId);
     e.preventDefault();
   });
   stage.addEventListener('pointermove', function (e) {
+    if (cropState) { cropMove(e); return; }
     if (!drag) return;
     var dx = (e.clientX - drag.sx) / scale, dy = (e.clientY - drag.sy) / scale;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
@@ -282,17 +294,19 @@
       if (it.type === 'image' && it.ar && !e.shiftKey) it.h = Math.round(it.w / it.ar); // pictures keep their proportions (hold Shift to stretch)
     }
     if (n) { n.style.left = it.x + 'px'; n.style.top = it.y + 'px'; n.style.width = it.w + 'px'; n.style.height = it.h + 'px'; }
+    if (it.type === 'image' && n && S.layoutImage) S.layoutImage(n, it);
     placeHandles(it); placeBar();
     save();
   });
   function endDrag(e) {
+    if (cropState) { if (cropState.drag) { cropState.drag = null; try { stage.releasePointerCapture(e.pointerId); } catch (x) {} } return; }
     if (!drag) return;
     var d = drag;
     drag = null;
     try { stage.releasePointerCapture(e.pointerId); } catch (x) {}
     if (d.moved) { drawThumb(deck.current); saveNow(); syncGeometry(); return; }
     // a click (no drag) on the box itself: start typing right there
-    if (!d.grip && d.mode === 'move' && nodes[d.id] && (d.item.type === 'text' || d.item.type === 'verse')) startEditing(d.item, nodes[d.id], d.part, { x: e.clientX, y: e.clientY });
+    if (!d.grip && d.mode === 'move' && nodes[d.id] && (d.item.type === 'text' || d.item.type === 'verse' || (d.item.type === 'shape' && d.item.shape !== 'line' && d.was))) startEditing(d.item, nodes[d.id], d.part, { x: e.clientX, y: e.clientY });
   }
   stage.addEventListener('pointerup', endDrag);
   stage.addEventListener('pointercancel', endDrag);
@@ -418,7 +432,7 @@
 
   function startEditing(item, node, part, where) {
     part = part === 'ref' && item.type === 'verse' ? 'ref' : 'text';
-    var target = part === 'ref' ? node.querySelector('.sl-ref') : (item.type === 'verse' ? node.querySelector('.sl-vt') : node);
+    var target = part === 'ref' ? node.querySelector('.sl-ref') : (item.type === 'verse' ? node.querySelector('.sl-vt') : (item.type === 'shape' ? node.querySelector('.sl-stt') : node));
     if (!target) return;
     editing = true; editPart = part; curPart = part; savedRange = null;
     edit = { item: item, target: target, part: part };
@@ -463,6 +477,7 @@
         if (ev.shiftKey) outdent(); else document.execCommand('insertText', false, '\t');
       } else if (ev.key === 'Enter' && part !== 'ref') { ev.preventDefault(); document.execCommand('insertLineBreak'); }
     };
+    if (item.type === 'shape') { skipBar = false; buildBar(); } // a shape shows the text bar while you type in it
     placeBar(); syncSizeBox();
   }
   // a whole-box style button was pressed while typing: redraw the box and keep typing
@@ -508,8 +523,8 @@
     fbar.textContent = '';
     var it = curEl();
     if (!it) { fbar.hidden = true; return; }
-    if (it.type === 'shape') { buildShapeBar(it); return; }
-    if (it.type === 'image') { buildImageBar(it); return; }
+    if (it.type === 'shape' && !(edit && edit.item === it)) { buildShapeBar(it); return; }
+    if (it.type === 'image') { if (cropState) buildCropBar(it); else buildImageBar(it); return; }
     var st = barStyle();
     var isRef = it.type === 'verse' && curPart === 'ref';
 
@@ -605,12 +620,49 @@
     S.renderSlide(st, deck.slides[i]);
     var w = t.querySelector('.tbox').clientWidth || 160;
     st.style.transform = 'scale(' + (w / W) + ')';
+    var li = liveIndex();
+    paintPv(i);
+  }
+  // Presenter View tab: every slide, 2 per row; click one to put it on the screen
+  var pvNodes = [];
+  function pvScale(item) { var w = item.querySelector('.pv-thumb').clientWidth; return w > 0 ? w / W : 0; }
+  function paintPv(i) {
+    var it = pvNodes[i];
+    if (!it || !deck.slides[i]) return;
+    var st = it.querySelector('.sl-stage'), sc = pvScale(it);
+    if (!sc) return; // tab not visible yet: painted when it is opened
+    S.renderSlide(st, deck.slides[i]);
+    st.style.transform = 'scale(' + sc + ')';
+  }
+  function drawPresenter() { // rebuild when the slides changed, otherwise only update the live mark
+    var grid = $('pvGrid'), li = liveIndex();
+    var same = pvNodes.length === deck.slides.length && pvNodes.every(function (n, i) { return n.dataset.id === deck.slides[i].id; });
+    if (!same) {
+      grid.textContent = '';
+      pvNodes = deck.slides.map(function (sl, i) {
+        var it = el('button', 'pv-item');
+        it.type = 'button';
+        it.dataset.id = sl.id;
+        it.title = 'Click to show slide ' + (i + 1) + ' on the screen';
+        var th = el('div', 'pv-thumb');
+        th.appendChild(el('div', 'sl-stage'));
+        it.appendChild(th);
+        it.appendChild(el('div', 'pv-num', String(i + 1)));
+        it.onclick = function () { goLive(i); };
+        grid.appendChild(it);
+        return it;
+      });
+      pvNodes.forEach(function (n, i) { paintPv(i); });
+    }
+    pvNodes.forEach(function (n, i) { n.classList.toggle('islive', i === li); });
+    $('pvNote').textContent = li < 0 ? 'Nothing is on the screen. Click a slide to show it.' : 'On screen: slide ' + (li + 1) + (deck.slides[li + 1] ? '. Next: slide ' + (li + 2) + '.' : ' (the last slide).') + ' Click any slide to show it.';
   }
   function drawThumbDots() {
     var li = liveIndex();
     thumbNodes.forEach(function (t, i) {
       var d = t.querySelector('.livedot');
       if (d) d.hidden = i !== li;
+      t.classList.toggle('islive', i === li);
     });
   }
   function drawSlideList() {
@@ -627,6 +679,8 @@
       tb.appendChild(dot);
       t.appendChild(tb);
       t.onclick = function (e) { clickSlide(i, e); };
+      t.ondblclick = function () { goLive(i); }; // double-click: put this slide on the screen
+      t.title = 'Click to edit. Double-click to show it on the screen.';
       t.ondragstart = function (e) { e.dataTransfer.setData('text/plain', String(i)); e.dataTransfer.effectAllowed = 'move'; };
       t.ondragover = function (e) { e.preventDefault(); t.classList.add('dragover'); };
       t.ondragleave = function () { t.classList.remove('dragover'); };
@@ -640,6 +694,7 @@
     });
     thumbNodes.forEach(function (t, i) { drawThumb(i); });
     drawThumbDots();
+    drawPresenter();
   }
   function highlightThumbs() {
     thumbNodes.forEach(function (t, i) {
@@ -658,6 +713,7 @@
    * Slide actions
    * ------------------------------------------------------------------ */
   function setSel(id) {
+    if (cropState) finishCrop();
     if (endEdit) endEdit();
     if (selId === id) return;
     selId = id;
@@ -690,6 +746,7 @@
     return r.length ? r : [deck.current];
   }
   function gotoSlide(i, keepPick) {
+    if (cropState) finishCrop();
     i = clamp(i, 0, deck.slides.length - 1);
     if (endEdit) endEdit();
     if (!keepPick) { picked = {}; anchor = i; }
@@ -697,7 +754,6 @@
     deck.current = i;
     selId = null;
     drawCanvas(); highlightThumbs(); buildFormat(); saveNow();
-    if (liveId) { liveId = deck.slides[i].id; pushLive(); } // the projector follows while live
   }
   function addSlide(slide, at) {
     at = at === undefined ? deck.current + 1 : at;
@@ -737,9 +793,45 @@
     c.elements.forEach(function (e) { e.id = uid(); });
     return c;
   }
+  // The clipboard is kept in browser storage too, so copied slides / boxes can be pasted in another tab or after a refresh.
+  var CLIP_KEY = 'sbvc-preaching-clip';
+  var lastClipId = '';
+  var CLIP_MARK = 'SBVC-CLIP:'; // written to the system clipboard on copy, so a picture copied earlier in another program is not pasted by mistake
+  var clipEls = [];       // boxes / shapes / pictures copied with Ctrl+C while one was selected
+  function readClip() { var c = S.getJSON(CLIP_KEY, null); return c && c.kind && Array.isArray(c.items) && c.items.length ? c : null; }
   function copySlides() {
     clip = pickedIndexes().map(function (i) { return clone(deck.slides[i]); });
+    lastClipId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    S.setJSON(CLIP_KEY, { kind: 'slides', items: clip, id: lastClipId });
     return clip.length;
+  }
+  function copyElement() { // the selected box, shape or picture (not the whole slide)
+    var it = curEl(); if (!it) return false;
+    clipEls = [clone(it)];
+    lastClipId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    S.setJSON(CLIP_KEY, { kind: 'elements', items: clipEls, id: lastClipId });
+    return true;
+  }
+  function pasteElements(items) {
+    if (cropState) finishCrop();
+    if (endEdit) endEdit();
+    var s = cur(), made = [];
+    items.forEach(function (src) {
+      var e = clone(src); e.id = uid();
+      function taken() { return s.elements.some(function (o) { return o.type === e.type && o.x === e.x && o.y === e.y && o.w === e.w && o.h === e.h; }); }
+      for (var k = 0; k < 20 && taken(); k++) { e.x += 30; e.y += 30; } // not exactly on top of the original
+      s.elements.push(e); made.push(e);
+    });
+    selId = made[made.length - 1].id;
+    changed({ rebuild: true });
+    return true;
+  }
+  function pasteClip() { // Ctrl+V: boxes go on this slide, copied slides come after the current one
+    var c = readClip();
+    if (!c) return false;
+    if (c.kind === 'elements') return pasteElements(c.items);
+    clip = c.items;
+    return pasteSlides();
   }
   function pasteSlides() {
     if (!clip.length) return false;
@@ -772,6 +864,7 @@
     changed({ rebuild: true });
   }
   function deleteElement() {
+    if (cropState) cancelCrop();
     var it = curEl();
     if (!it) return;
     cur().elements = cur().elements.filter(function (e) { return e.id !== it.id; });
@@ -780,12 +873,14 @@
     if (it.type === 'image') pruneImages();
   }
   function duplicateElement() {
+    if (cropState) finishCrop();
     var it = curEl();
     if (!it) return;
     var c = clone(it); c.id = uid(); c.x += 30; c.y += 30;
     addElement(c);
   }
   function reorderElement(front) {
+    if (cropState) finishCrop();
     var it = curEl();
     if (!it) return;
     var els = cur().elements.filter(function (e) { return e.id !== it.id; });
@@ -1295,7 +1390,8 @@
    * ------------------------------------------------------------------ */
   function showTab(id) {
     document.querySelectorAll('#pTabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.pane === id); });
-    ['paneFormat', 'paneBible'].forEach(function (p) { $(p).classList.toggle('on', p === id); });
+    ['paneFormat', 'paneBible', 'paneView'].forEach(function (p) { $(p).classList.toggle('on', p === id); });
+    if (id === 'paneView') pvNodes.forEach(function (n, i) { paintPv(i); });
     if (deck.tab !== id) { deck.tab = id; save(); }
     if (id === 'paneBible') drawBiblePreview();
   }
@@ -1318,12 +1414,26 @@
     if (c) { addElement(makeVerse(c, cur().elements.length === 0)); }
     else S.toast('Pick a verse', 'Choose a book, chapter and verse in the Bible tab.');
   };
-  $('tShow').onclick = function () {
+  // Presenting: the screen keeps showing its own slide while you edit other slides (like PowerPoint's presenter view).
+  // It only changes when you press "Show this slide", double-click a slide, or use the Screen arrows / Alt + Left / Right.
+  var presentWin = null;
+  function goLive(i) {
     S.setRaw(K.contentType, 'preaching');
-    liveId = cur().id;
+    var wasLive = liveId !== null;
+    liveId = deck.slides[i].id;
     pushLive();
-    window.open('present.html', 'present');
-  };
+    if (!wasLive || (presentWin && presentWin.closed)) presentWin = window.open('present.html', 'present');
+  }
+  function liveStep(d) { // move only the screen
+    var i = liveIndex();
+    if (i < 0) return;
+    var j = clamp(i + d, 0, deck.slides.length - 1);
+    if (j === i) return;
+    liveId = deck.slides[j].id;
+    pushLive();
+  }
+  $('tShow').onclick = function () { goLive(deck.current); };
+  window.addEventListener('resize', function () { if ($('paneView').classList.contains('on')) pvNodes.forEach(function (n, i) { paintPv(i); }); });
   $('tUndo').onclick = undo;
   $('tRedo').onclick = redo;
   $('tClear').onclick = function () { liveId = null; pushLive(); };
@@ -1340,6 +1450,14 @@
       }
       return;
     }
+    if (cropState) { // while cropping: Enter applies, Esc leaves, nothing else acts on the slide
+      if (e.key === 'Enter') { e.preventDefault(); finishCrop(); }
+      else if (e.key === 'Escape') { e.preventDefault(); cancelCrop(); }
+      return;
+    }
+    if (liveId && e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { // move the screen only
+      e.preventDefault(); liveStep(e.key === 'ArrowRight' ? 1 : -1); return;
+    }
     if (editing || e.altKey) return;
     var t = e.target;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
@@ -1347,9 +1465,9 @@
     if (e.ctrlKey || e.metaKey) { // slide copy / cut / paste / select all / duplicate
       var lk = k.toLowerCase();
       var hasText = window.getSelection && String(window.getSelection()).length > 0;
-      if (lk === 'c' && !hasText) { var n1 = copySlides(); S.toast('Copied', n1 + (n1 === 1 ? ' slide' : ' slides') + '. Press Ctrl+V to paste.'); e.preventDefault(); }
-      else if (lk === 'x' && !hasText) { var n2 = copySlides(); if (n2) { deleteSlide(); S.toast('Cut', n2 + (n2 === 1 ? ' slide' : ' slides') + '. Press Ctrl+V to paste.'); } e.preventDefault(); }
-      else if (lk === 'd') { duplicateSlide(); e.preventDefault(); }
+      var selEl = curEl();
+      if (lk === 'c' || lk === 'x') { return; } // handled by the copy / cut events (they also replace what is on the system clipboard)
+      else if (lk === 'd') { if (selEl) duplicateElement(); else duplicateSlide(); e.preventDefault(); }
       else if (lk === 'a') {
         picked = {}; deck.slides.forEach(function (s) { picked[s.id] = true; });
         highlightThumbs(); e.preventDefault();
@@ -1357,6 +1475,13 @@
       return;
     }
     var it = curEl();
+    if (it && it.type === 'shape' && it.shape !== 'line' && nodes[it.id] && !e.ctrlKey && !e.metaKey && (k.length === 1 || k === 'Enter')) { // typing with a shape selected types inside it
+      e.preventDefault();
+      ensureShapeText(it);
+      startEditing(it, nodes[it.id], 'text', null);
+      if (k !== 'Enter') document.execCommand('insertText', false, k);
+      return;
+    }
     if (k === 'PageUp') { gotoSlide(deck.current - 1); e.preventDefault(); }
     else if (k === 'PageDown') { gotoSlide(deck.current + 1); e.preventDefault(); }
     else if (k === 'Escape') { setSel(null); }
@@ -1422,6 +1547,7 @@
       id: uid(), type: 'shape', shape: kind, x: Math.round((W - sz[0]) / 2) + off, y: Math.round((H - sz[1]) / 2) + off, w: sz[0], h: sz[1],
       fill: line ? '' : '#3B82F6', stroke: line ? '#3B82F6' : '', strokeW: line ? 8 : 0, opacity: 1, auto: true
     };
+    ensureShapeText(it); // a shape has its own text: click it again (or just start typing) to type inside
     addElement(themed(it));
   }
 
@@ -1472,6 +1598,14 @@
     fmtHost.appendChild(sliderField(isLine ? 'Line thickness' : 'Outline width', 0, 40, 1, 'px', function () { return item.strokeW || 0; }, function (v) {
       item.strokeW = v; if (v && !item.stroke) item.stroke = item.fill || '#FFFFFF'; changed();
     }));
+    if (!isLine) {
+      ensureShapeText(item);
+      var tf = field('Text inside the shape');
+      var ta = el('textarea'); ta.rows = 3; ta.value = item.text || ''; ta.placeholder = 'Type here, or click the shape again and type on the slide';
+      ta.oninput = function () { item.text = ta.value; delete item.html; changed(); };
+      ta.onkeydown = function (e) { e.stopPropagation(); };
+      tf.appendChild(ta); fmtHost.appendChild(tf);
+    }
     fmtHost.appendChild(sliderField('Opacity', 10, 100, 5, '%', function () { return Math.round((item.opacity == null ? 1 : item.opacity) * 100); }, function (v) { item.opacity = v / 100; changed(); }));
     geomAndActions(item);
   }
@@ -1576,7 +1710,9 @@
     if (!ids.length) return;
     var used = {};
     function scan(s) { s.elements.forEach(function (e) { if (e.imageId) used[e.imageId] = true; }); }
-    deck.slides.forEach(scan); clip.forEach(scan);
+    deck.slides.forEach(scan); clip.forEach(scan); clipEls.forEach(function (e) { if (e.imageId) used[e.imageId] = true; });
+    var sc = readClip(); // what is on the clipboard (maybe copied in another tab)
+    if (sc) sc.items.forEach(function (x) { if (sc.kind === 'slides') scan(x); else if (x.imageId) used[x.imageId] = true; });
     var drop = ids.filter(function (i) { // a picture stays while an undo / redo step can still bring it back
       if (used[i]) return false;
       for (var u = 0; u < undoStack.length; u++) if (undoStack[u].indexOf(i) >= 0) return false;
@@ -1604,7 +1740,31 @@
   // a file dropped outside the slide must not make the browser leave the page
   ['dragover', 'drop'].forEach(function (t) { document.addEventListener(t, function (e) { if (hasFiles(e)) e.preventDefault(); }); });
 
-  // Ctrl+V: a picture from the clipboard goes on the slide; otherwise pasted slides (see Ctrl+C)
+  // Ctrl+C / Ctrl+X on the slides: the selected box, or the picked slides. The copy event also puts a marker on the system
+  // clipboard, so Ctrl+V knows this copy is newer than any picture copied earlier from outside.
+  function appCopyCut(e, isCut) {
+    var t = e.target;
+    if (editing || cropState || (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable))) return;
+    if (window.getSelection && String(window.getSelection()).length > 0) return; // normal copy of selected text
+    var selEl = curEl(), msg;
+    if (selEl) {
+      copyElement();
+      var what = selEl.type === 'image' ? 'picture' : 'box';
+      if (isCut) { deleteElement(); msg = ['Cut', 'The ' + what + ' is cut. Press Ctrl+V to paste it.']; }
+      else msg = ['Copied', 'The ' + what + ' is copied. Press Ctrl+V to paste it on a slide.'];
+    } else {
+      var n = copySlides();
+      if (isCut && n) deleteSlide();
+      msg = [isCut ? 'Cut' : 'Copied', n + (n === 1 ? ' slide' : ' slides') + '. Press Ctrl+V to paste.'];
+    }
+    try { if (e.clipboardData) e.clipboardData.setData('text/plain', CLIP_MARK + lastClipId); } catch (x) {}
+    e.preventDefault();
+    S.toast(msg[0], msg[1]);
+  }
+  document.addEventListener('copy', function (e) { appCopyCut(e, false); });
+  document.addEventListener('cut', function (e) { appCopyCut(e, true); });
+
+  // Ctrl+V: what was copied here comes first; otherwise a picture from the clipboard goes on the slide
   document.addEventListener('paste', function (e) {
     var t = e.target;
     if (editing || (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable))) return;
@@ -1614,13 +1774,154 @@
       else if (cd.items) Array.prototype.forEach.call(cd.items, function (i) { if (i.kind === 'file') { var f = i.getAsFile(); if (f) files.push(f); } });
     }
     files = files.filter(function (f) { return String(f.type).indexOf('image/') === 0; });
-    if (files.length) { e.preventDefault(); addImageFiles(files); return; }
-    if (clip.length && pasteSlides()) e.preventDefault();
+    var text = '';
+    try { text = cd ? cd.getData('text/plain') : ''; } catch (x) {}
+    var mine = readClip();
+    if (mine && text.indexOf(CLIP_MARK) === 0 && text.slice(CLIP_MARK.length).trim() === String(mine.id || '')) { // copied in this app last
+      if (pasteClip()) e.preventDefault();
+      return;
+    }
+    if (files.length) { e.preventDefault(); addImageFiles(files); return; }  // a picture copied outside
+    if (pasteClip()) e.preventDefault();
   });
+
+  /* ------------------------------------------------------------------ *
+   * Picture editing: crop, turn, flip, cut to a shape. The original picture is never changed;
+   * the slide only remembers how to show it (crop, rot, fx, fy, mask).
+   * ------------------------------------------------------------------ */
+  var cropState = null;   // {item, full, rect, orig, drag} while the crop frame is on screen
+  function imgRot(it) { return (((it.rot || 0) % 360) + 360) % 360; }
+  // which edge of the ORIGINAL picture is at the visual left / top / right / bottom (after flipping and turning)
+  function edgeOwners(it) {
+    var e = ['l', 't', 'r', 'b'];
+    if (it.fx) e = [e[2], e[1], e[0], e[3]];
+    if (it.fy) e = [e[0], e[3], e[2], e[1]];
+    for (var i = 0; i < imgRot(it) / 90; i++) e = [e[3], e[0], e[1], e[2]];
+    return e;
+  }
+  function visCrop(it) { var c = it.crop || {}, o = edgeOwners(it); return { l: c[o[0]] || 0, t: c[o[1]] || 0, r: c[o[2]] || 0, b: c[o[3]] || 0 }; }
+  function setVisCrop(it, v) {
+    var o = edgeOwners(it), c = { l: 0, t: 0, r: 0, b: 0 };
+    c[o[0]] = Math.max(0, v.l); c[o[1]] = Math.max(0, v.t); c[o[2]] = Math.max(0, v.r); c[o[3]] = Math.max(0, v.b);
+    if (c.l + c.t + c.r + c.b < 0.002) delete it.crop; else it.crop = c;
+  }
+  function rotateImage(it, dir) { // 90 degrees; the box turns with it
+    var cx = it.x + it.w / 2, cy = it.y + it.h / 2, w = it.h, h = it.w;
+    it.w = Math.round(w); it.h = Math.round(h); it.x = Math.round(cx - it.w / 2); it.y = Math.round(cy - it.h / 2);
+    it.rot = (imgRot(it) + 90 * dir + 360) % 360;
+    it.ar = it.ar ? 1 / it.ar : it.w / it.h;
+    changed({ rebuild: true });
+  }
+  function flipImage(it, horizontal) { // flips what you see, whichever way the picture is turned
+    var sideways = imgRot(it) % 180 !== 0, k = horizontal !== sideways ? 'fx' : 'fy';
+    it[k] = !it[k];
+    changed({ rebuild: true });
+  }
+  function maskImage(it, m) { if (m) it.mask = m; else delete it.mask; changed({ rebuild: true }); }
+  function resetImage(it) { // back to the whole original picture
+    var vis = it.ar || (it.w / it.h);
+    var unturned = imgRot(it) % 180 !== 0 ? 1 / vis : vis;          // shape of the cropped picture before turning
+    var sar = unturned * (it.crop ? (1 - (it.crop.t || 0) - (it.crop.b || 0)) / (1 - (it.crop.l || 0) - (it.crop.r || 0)) : 1);
+    var cx = it.x + it.w / 2, cy = it.y + it.h / 2, w = Math.max(it.w, 60);
+    delete it.crop; delete it.rot; delete it.fx; delete it.fy; delete it.mask;
+    it.ar = sar; it.w = Math.round(w); it.h = Math.round(w / sar);
+    it.x = Math.round(cx - it.w / 2); it.y = Math.round(cy - it.h / 2);
+    changed({ rebuild: true });
+  }
+
+  function startCrop(it) {
+    if (endEdit) endEdit();
+    if (cropState) return;
+    var v = visCrop(it), fw = it.w / (1 - v.l - v.r), fh = it.h / (1 - v.t - v.b);
+    var full = { x: it.x - v.l * fw, y: it.y - v.t * fh, w: fw, h: fh };
+    cropState = { item: it, full: full, rect: { x: it.x, y: it.y, w: it.w, h: it.h }, drag: null,
+      orig: { x: it.x, y: it.y, w: it.w, h: it.h, crop: it.crop ? clone(it.crop) : null } };
+    it.crop = null; it.x = full.x; it.y = full.y; it.w = full.w; it.h = full.h; // show the whole picture while cropping
+    drawCanvas();
+  }
+  function finishCrop() {
+    var cs = cropState; if (!cs) return;
+    cropState = null;
+    var it = cs.item, f = cs.full, r = cs.rect;
+    setVisCrop(it, { l: (r.x - f.x) / f.w, t: (r.y - f.y) / f.h, r: (f.x + f.w - r.x - r.w) / f.w, b: (f.y + f.h - r.y - r.h) / f.h });
+    it.x = Math.round(r.x); it.y = Math.round(r.y); it.w = Math.round(r.w); it.h = Math.round(r.h); it.ar = it.w / it.h;
+    changed({ rebuild: true });
+  }
+  function cancelCrop() {
+    var cs = cropState; if (!cs) return;
+    cropState = null;
+    var it = cs.item, o = cs.orig;
+    it.x = o.x; it.y = o.y; it.w = o.w; it.h = o.h;
+    if (o.crop) it.crop = o.crop; else delete it.crop;
+    drawCanvas(); drawThumb(deck.current); buildFormat();
+  }
+  function drawCropBox() {
+    Array.prototype.forEach.call(stage.querySelectorAll('.cropdim, .cropbox'), function (n) { n.remove(); });
+    var cs = cropState; if (!cs) return;
+    var f = cs.full, r = cs.rect;
+    function dim(x, y, w, h) {
+      var d = el('div', 'cropdim'); d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + Math.max(0, w) + 'px;height:' + Math.max(0, h) + 'px';
+      stage.appendChild(d);
+    }
+    dim(f.x, f.y, f.w, r.y - f.y);
+    dim(f.x, r.y + r.h, f.w, f.y + f.h - r.y - r.h);
+    dim(f.x, r.y, r.x - f.x, r.h);
+    dim(r.x + r.w, r.y, f.x + f.w - r.x - r.w, r.h);
+    var b = el('div', 'cropbox'); b.style.cssText = 'left:' + r.x + 'px;top:' + r.y + 'px;width:' + r.w + 'px;height:' + r.h + 'px';
+    ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(function (d) {
+      var h = el('div', 'ch ch-' + d); h.dataset.dir = d; b.appendChild(h);
+    });
+    stage.appendChild(b);
+  }
+  function cropDown(e) {
+    var cs = cropState;
+    var h = e.target.closest('.ch'), b = e.target.closest('.cropbox');
+    if (!h && !b) { finishCrop(); return; } // a click outside the frame applies the crop
+    cs.drag = { dir: h ? h.dataset.dir : 'move', sx: e.clientX, sy: e.clientY, rect: { x: cs.rect.x, y: cs.rect.y, w: cs.rect.w, h: cs.rect.h } };
+    stage.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }
+  function cropMove(e) {
+    var cs = cropState, d = cs && cs.drag; if (!d) return;
+    var dx = (e.clientX - d.sx) / scale, dy = (e.clientY - d.sy) / scale, f = cs.full, MIN = 30, r0 = d.rect;
+    var x1 = r0.x, y1 = r0.y, x2 = r0.x + r0.w, y2 = r0.y + r0.h;
+    if (d.dir === 'move') {
+      x1 = clamp(r0.x + dx, f.x, f.x + f.w - r0.w); y1 = clamp(r0.y + dy, f.y, f.y + f.h - r0.h);
+      x2 = x1 + r0.w; y2 = y1 + r0.h;
+    } else {
+      if (d.dir.indexOf('w') >= 0) x1 = clamp(r0.x + dx, f.x, x2 - MIN);
+      if (d.dir.indexOf('e') >= 0) x2 = clamp(x2 + dx, x1 + MIN, f.x + f.w);
+      if (d.dir.indexOf('n') >= 0) y1 = clamp(r0.y + dy, f.y, y2 - MIN);
+      if (d.dir.indexOf('s') >= 0) y2 = clamp(y2 + dy, y1 + MIN, f.y + f.h);
+    }
+    cs.rect = { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+    drawCropBox();
+  }
+  function buildCropBar(it) {
+    fbar.appendChild(el('span', 'fb-label', 'Crop: drag the edges'));
+    fbar.appendChild(fbtn('Done', 'Apply the crop (Enter)', finishCrop, false));
+    fbar.appendChild(fbtn('Cancel', 'Leave without cropping (Esc)', cancelCrop, false));
+    fbar.hidden = false; placeBar();
+  }
 
   function buildImageFormat(item) {
     fmtHost.appendChild(el('h4', '', 'Picture'));
     fmtHost.appendChild(el('div', 'pnote', 'Drag the corner to resize (it keeps its shape; hold Shift to stretch). You can also drop or paste more pictures onto the slide.'));
+    var ed = el('div', 'prow2');
+    var bc = el('button', 'btn outline', '✂ Crop'); bc.onclick = function () { startCrop(item); };
+    var bl = el('button', 'btn outline', '↺ Turn left'); bl.onclick = function () { rotateImage(item, -1); };
+    var br = el('button', 'btn outline', '↻ Turn right'); br.onclick = function () { rotateImage(item, 1); };
+    var bh = el('button', 'btn outline', '⇆ Flip left-right'); bh.onclick = function () { flipImage(item, true); };
+    var bv = el('button', 'btn outline', '⇅ Flip up-down'); bv.onclick = function () { flipImage(item, false); };
+    var bz = el('button', 'btn outline', 'Reset picture'); bz.title = 'Remove the crop, turn, flip and shape'; bz.onclick = function () { resetImage(item); };
+    [bc, bz, bl, br, bh, bv].forEach(function (b) { ed.appendChild(b); });
+    fmtHost.appendChild(ed);
+    var mf = field('Shape of the picture'); mf.style.marginTop = '10px';
+    var ms = el('select');
+    [['', 'Rectangle'], ['round', 'Rounded corners'], ['oval', 'Oval / circle']].forEach(function (o) { var op = el('option', '', o[1]); op.value = o[0]; ms.appendChild(op); });
+    ms.value = item.mask || '';
+    ms.onchange = function () { maskImage(item, ms.value); };
+    mf.appendChild(ms); fmtHost.appendChild(mf);
     fmtHost.appendChild(sliderField('Opacity', 10, 100, 5, '%', function () { return Math.round((item.opacity == null ? 1 : item.opacity) * 100); }, function (v) { item.opacity = v / 100; changed(); }));
     var row = el('div', 'prow2');
     var fit1 = el('button', 'btn outline', 'Fit to slide'); fit1.onclick = function () { fitImage(item); };
@@ -1635,6 +1936,13 @@
     changed({ rebuild: true });
   }
   function buildImageBar(it) {
+    fbar.appendChild(fbtn('✂', 'Crop the picture', function () { startCrop(it); }, false));
+    fbar.appendChild(fbtn('↺', 'Turn left', function () { rotateImage(it, -1); }, false));
+    fbar.appendChild(fbtn('↻', 'Turn right', function () { rotateImage(it, 1); }, false));
+    fbar.appendChild(fbtn('⇆', 'Flip sideways', function () { flipImage(it, true); }, false));
+    fbar.appendChild(fbtn('⇅', 'Flip upside down', function () { flipImage(it, false); }, false));
+    fbar.appendChild(fbtn('◯', 'Cut to a shape: rectangle / rounded / oval', function () { maskImage(it, it.mask === 'round' ? 'oval' : (it.mask === 'oval' ? '' : 'round')); }, !!it.mask));
+    fbar.appendChild(el('span', 'fb-sep'));
     fbar.appendChild(fbtn('Fit to slide', 'Make the picture as big as the slide', function () { fitImage(it); }, false));
     fbar.appendChild(fbtn('Original shape', 'Undo stretching', function () { if (it.ar) { it.h = Math.round(it.w / it.ar); changed(); } }, false));
     fbar.appendChild(el('span', 'fb-sep'));
@@ -1658,7 +1966,7 @@
   fit();
   drawCanvas();
   buildFormat();
-  showTab(deck.tab === 'paneBible' ? 'paneBible' : 'paneFormat');
+  showTab(deck.tab === 'paneBible' || deck.tab === 'paneView' ? deck.tab : 'paneFormat');
   pushLive();
   // thumbnails need real widths: draw them again once the layout settled
   setTimeout(function () { thumbNodes.forEach(function (t, i) { drawThumb(i); }); fit(); }, 60);

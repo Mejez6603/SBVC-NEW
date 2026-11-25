@@ -44,7 +44,8 @@
         <button class="btn outline sm" id="tNext" title="Next slide (PageDown)">&#9654;</button>
         <span style="flex:1"></span>
         <span class="live-badge" id="liveBadge" hidden>&#9679; LIVE</span>
-        <button class="btn sm" id="tShow" title="Open the presentation window and show this slide">&#9654; Present</button>
+
+        <button class="btn sm" id="tShow" title="Open the presentation window and show this slide. While live: put the slide you are editing on the screen.">&#9654; Present</button>
         <button class="btn outline sm" id="tClear" title="Clear the screen">&#10005; Clear</button>
         <button class="btn outline sm" id="tFull" title="Fullscreen the presentation window (F)">&#9974;</button>
       </div>
@@ -58,15 +59,19 @@
 
     <!-- format + Bible (right) -->
     <div class="col side">
-      <div class="tabs" id="pTabs" style="grid-template-columns:1fr 1fr">
+      <div class="tabs" id="pTabs" style="grid-template-columns:1fr 1fr 1.5fr">
         <button data-pane="paneFormat" class="on">Format</button>
         <button data-pane="paneBible">Bible</button>
+        <button data-pane="paneView">Presenter View</button>
       </div>
       <div class="tabpane on" id="paneFormat">
         <div class="scroll" style="flex:1"><div class="custom" id="formatHost"></div></div>
       </div>
       <div class="tabpane" id="paneBible">
         <div class="scroll" style="flex:1"><div class="custom" id="bibleHost"></div></div>
+      </div>
+      <div class="tabpane" id="paneView">
+        <div class="scroll" style="flex:1"><div class="custom"><h4>Presenter View</h4><p class="pnote" id="pvNote"></p><div class="pv-grid" id="pvGrid"></div></div></div>
       </div>
     </div>
   </div>

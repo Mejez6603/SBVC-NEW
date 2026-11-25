@@ -347,3 +347,26 @@ body:has(> .app), body:has(> .page) { overflow: hidden; }
 /* color pickers line up on one row even when a label wraps to two lines */
 .prow2 > .field:has(.cpick) { display: flex; flex-direction: column; justify-content: space-between; }
 .prow2 > .field:has(.cpick) .cpick { margin-top: auto; }
+/* picture cropping */
+.pcanvas-stage .cropdim { position: absolute; background: rgba(0,0,0,.6); pointer-events: none; z-index: 4; }
+.pcanvas-stage .cropbox { position: absolute; box-sizing: border-box; border: calc(2px * var(--inv, 1)) solid #fff; cursor: move; z-index: 5; }
+.pcanvas-stage .ch { position: absolute; width: calc(16px * var(--inv, 1)); height: calc(16px * var(--inv, 1)); background: #fff; border: calc(2px * var(--inv, 1)) solid #3b82f6; box-sizing: border-box; border-radius: 2px; transform: translate(-50%, -50%); }
+.pcanvas-stage .ch-nw { left: 0; top: 0; cursor: nwse-resize; } .pcanvas-stage .ch-n { left: 50%; top: 0; cursor: ns-resize; }
+.pcanvas-stage .ch-ne { left: 100%; top: 0; cursor: nesw-resize; } .pcanvas-stage .ch-e { left: 100%; top: 50%; cursor: ew-resize; }
+.pcanvas-stage .ch-se { left: 100%; top: 100%; cursor: nwse-resize; } .pcanvas-stage .ch-s { left: 50%; top: 100%; cursor: ns-resize; }
+.pcanvas-stage .ch-sw { left: 0; top: 100%; cursor: nesw-resize; } .pcanvas-stage .ch-w { left: 0; top: 50%; cursor: ew-resize; }
+/* presenting: the slide on the screen is marked in red, and the screen has its own arrows */
+.pthumb.islive .tbox { border-color: #ef4444; box-shadow: 0 0 0 2px #ef4444; }
+.livectl { display: inline-flex; gap: 4px; }
+.livectl[hidden] { display: none; }
+/* presenter view strip (only while live) */
+.pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.pv-item { all: unset; box-sizing: border-box; cursor: pointer; display: block; position: relative; min-width: 0; }
+.pv-item:focus-visible .pv-thumb { outline: 2px solid var(--ring, #60a5fa); }
+.pv-thumb { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border: 2px solid var(--border); border-radius: 4px; background: #000; }
+.pv-item:hover .pv-thumb { border-color: var(--muted-foreground); }
+.pv-item.islive .pv-thumb { border-color: #ef4444; box-shadow: 0 0 0 1px #ef4444; }
+.pv-thumb .sl-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; }
+.pv-num { font-size: 11px; font-weight: 600; color: var(--muted-foreground); margin-top: 3px; text-align: center; }
+.pv-item.islive .pv-num { color: #ef4444; }
+.pv-item.islive .pv-num::after { content: " \00b7 on screen"; }

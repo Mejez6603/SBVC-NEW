@@ -45,7 +45,42 @@
     line: 'M0 50L100 50'
   };
 
-  function drawShape(n, el) {
+  // ---- text inside a shape (typed straight into it) ----
+  var TEXT_PAD = { triangle: '42% 18% 6%', diamond: '20%', star: '24% 18% 14%', heart: '18% 14% 12%', ellipse: '10% 12%', cross: '26%',
+    arrow: '6% 22% 6% 6%', chevron: '6% 22% 6% 16%', round: '4% 6%', rect: '4% 6%' };
+  function lum(c) { // 0 (black) .. 1 (white) for #rgb / #rrggbb, otherwise null
+    var m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c || '');
+    if (!m) return null;
+    var h = m[1]; if (h.length === 3) h = h.replace(/./g, '$&$&');
+    return (0.299 * parseInt(h.substr(0, 2), 16) + 0.587 * parseInt(h.substr(2, 2), 16) + 0.114 * parseInt(h.substr(4, 2), 16)) / 255;
+  }
+  function autoTextColor(el, slideBg) { // 'auto' text color: dark on a light fill, white on a dark one (no fill: judged by the slide background)
+    var l = lum(el.fill);
+    if (l === null) l = lum(slideBg);
+    if (l === null) return '#FFFFFF';
+    return l > 0.6 ? '#111827' : '#FFFFFF';
+  }
+  function drawShapeText(n, el, slideBg) {
+    var st = el.style || { fontFamily: 'Inter', fontSize: 40, color: 'auto', bold: false, italic: false, align: 'center', lineHeight: 1.25 };
+    var box = document.createElement('div');
+    box.className = 'sl-st';
+    box.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:' + (TEXT_PAD[el.shape] || '6%');
+    var t = document.createElement('div');
+    t.className = 'sl-stt';
+    if (el.html) richInto(t, el.html); else t.textContent = el.text || '';
+    var s2 = {}; for (var k in st) s2[k] = st[k];
+    s2.color = st.color && st.color !== 'auto' ? st.color : autoTextColor(el, slideBg);
+    applyTextStyle(t, s2);
+    t.style.maxWidth = '100%'; t.style.minWidth = '1em'; t.style.minHeight = '1.25em'; t.style.overflowWrap = 'anywhere'; t.style.outline = 'none';
+    box.appendChild(t);
+    n.appendChild(box);
+  }
+  function drawShape(n, el, slideBg) {
+    drawShapeBody(n, el);
+    if (el.shape !== 'line') drawShapeText(n, el, slideBg);
+  }
+
+  function drawShapeBody(n, el) {
     var kind = el.shape || 'rect', sw = el.strokeW || 0;
     n.style.overflow = 'visible';
     if (el.opacity !== undefined && el.opacity < 1) n.style.opacity = String(el.opacity);
@@ -71,14 +106,34 @@
     n.appendChild(svg);
   }
 
+  // A picture can be cropped (el.crop = {l,t,r,b} fractions of the original), turned (el.rot = 0/90/180/270),
+  // flipped (el.fx / el.fy, applied before turning) and cut to a shape (el.mask = 'round' | 'oval').
+  function rotOf(el) { return (((el.rot || 0) % 360) + 360) % 360; }
+  function layoutImage(n, el) { // the turning box is as wide as the picture is tall when it is turned sideways
+    var wrap = n.querySelector('.sl-imgrot');
+    if (!wrap) return;
+    var odd = rotOf(el) % 180 !== 0;
+    wrap.style.width = (odd ? el.h : el.w) + 'px';
+    wrap.style.height = (odd ? el.w : el.h) + 'px';
+  }
   function drawImage(n, el) {
     if (el.opacity !== undefined && el.opacity < 1) n.style.opacity = String(el.opacity);
     var url = imageMap()[el.imageId];
     if (!url) return;
+    var c = el.crop || {}, l = c.l || 0, t = c.t || 0, r = c.r || 0, b = c.b || 0;
+    var cw = Math.max(0.02, 1 - l - r), ch = Math.max(0.02, 1 - t - b);
+    var clip = document.createElement('div');
+    clip.className = 'sl-imgclip';
+    clip.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;' +
+      (el.mask === 'oval' ? 'border-radius:50%;' : el.mask === 'round' ? 'border-radius:12%;' : '');
+    var wrap = document.createElement('div');
+    wrap.className = 'sl-imgrot';
+    wrap.style.cssText = 'position:absolute;left:50%;top:50%;overflow:hidden;transform:translate(-50%,-50%) rotate(' + rotOf(el) + 'deg) scale(' + (el.fx ? -1 : 1) + ',' + (el.fy ? -1 : 1) + ')';
     var im = document.createElement('img');
     im.src = url; im.alt = ''; im.draggable = false;
-    im.style.cssText = 'width:100%;height:100%;display:block;object-fit:fill;pointer-events:none';
-    n.appendChild(im);
+    im.style.cssText = 'position:absolute;max-width:none;display:block;object-fit:fill;pointer-events:none;width:' + (100 / cw) + '%;height:' + (100 / ch) + '%;left:' + (-l / cw * 100) + '%;top:' + (-t / ch * 100) + '%';
+    wrap.appendChild(im); clip.appendChild(wrap); n.appendChild(clip);
+    layoutImage(n, el);
   }
 
   // ---- rich text: parts of a box can have their own size / color / font / bold / italic.
@@ -158,7 +213,7 @@
       n.style.height = el.h + 'px';
 
       if (el.type === 'shape') {
-        drawShape(n, el);
+        drawShape(n, el, bg.color);
       } else if (el.type === 'image') {
         drawImage(n, el);
       } else if (el.type === 'verse') {
@@ -193,6 +248,7 @@
   S.renderSlide = renderSlide;
   S.SHAPE_PATHS = SHAPE_PATHS;
   S.richInto = richInto;
+  S.layoutImage = layoutImage;
   S.cleanRich = cleanRich;
   S.preachImages = imageMap;
 })();
