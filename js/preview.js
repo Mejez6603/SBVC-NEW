@@ -30,7 +30,7 @@
       var c = S.getCustom(customKey);
       var sc = scale();
 
-      S.applyBackground(container, !!opts.bgImage);
+      S.applyBackground(container, !!opts.bgImage, !!opts.bgImage);
       container.style.paddingLeft = container.style.paddingRight = (c.horizontalPadding * sc) + 'rem';
       container.textContent = '';
       video = null;

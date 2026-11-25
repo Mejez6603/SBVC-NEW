@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SBVC - PowerPoint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,700;1,7..72,400&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Ubuntu:wght@400;500;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header id="topnav" class="topnav"></header>
+
+  <div class="main">
+    <!-- slide thumbnails (left) -->
+    <div class="col pslides">
+      <div class="pslides-head">Slides <span class="muted" id="slideCount"></span></div>
+      <div class="scroll" id="slideList" style="flex:1"></div>
+      <div class="pslides-foot">
+        <button class="btn outline" id="addSlide" style="width:100%">+ New Slide</button>
+      </div>
+    </div>
+
+    <!-- toolbar + main slide (center) -->
+    <div class="col pcenter">
+      <div class="ptools">
+        <button class="btn outline sm" id="tDesign" title="Choose a design template (background, fonts and colors)">&#127912; Design</button>
+        <span class="ptools-sep"></span>
+        <button class="btn outline sm" id="tText" title="Add a text box to this slide">+ Text</button>
+        <button class="btn outline sm" id="tVerse" title="Add a Bible verse box (use the Bible tab to pick the verse)">+ Verse</button>
+        <button class="btn outline sm" id="tShape" title="Add a shape (rectangle, oval, arrow, star, line ...)">&#9650; Shapes</button>
+        <button class="btn outline sm" id="tImage" title="Add a picture (you can also drop or paste pictures onto the slide)">&#128444; Picture</button>
+        <input type="file" id="imgIn" accept="image/*" multiple hidden>
+        <span class="ptools-sep"></span>
+        <button class="btn outline sm" id="tUndo" title="Undo (Ctrl+Z)" disabled>&#8630;</button>
+        <button class="btn outline sm" id="tRedo" title="Redo (Ctrl+Y)" disabled>&#8631;</button>
+        <span class="ptools-sep"></span>
+        <button class="btn outline sm" id="tDup" title="Duplicate this slide">Duplicate</button>
+        <button class="btn outline sm" id="tDel" title="Delete this slide">Delete</button>
+        <span class="ptools-sep"></span>
+        <button class="btn outline sm" id="tExport" title="Save all slides to a file (backup, or move to another computer)">&#11015; Export</button>
+        <button class="btn outline sm" id="tImport" title="Bring slides in from an exported file">&#11014; Import</button>
+        <input type="file" id="impIn" accept=".json,.sbvc,.pptx,application/json,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden>
+        <span class="ptools-sep"></span>
+        <button class="btn outline sm" id="tPrev" title="Previous slide (PageUp)">&#9664;</button>
+        <button class="btn outline sm" id="tNext" title="Next slide (PageDown)">&#9654;</button>
+        <span style="flex:1"></span>
+        <span class="live-badge" id="liveBadge" hidden>&#9679; LIVE</span>
+
+        <button class="btn sm" id="tShow" title="Open the presentation window and show this slide. While live: put the slide you are editing on the screen.">&#9654; Present</button>
+        <button class="btn outline sm" id="tClear" title="Clear the screen">&#10005; Clear</button>
+        <button class="btn outline sm" id="tFull" title="Fullscreen the presentation window (F)">&#9974;</button>
+      </div>
+      <div class="pcanvas-wrap" id="canvasWrap">
+        <div class="pcanvas" id="canvasBox">
+          <div class="pcanvas-stage" id="stage"></div>
+        </div>
+      </div>
+      <div class="pstatus muted" id="pStatus">Click a box and type. Slides: Shift or Ctrl + click to pick several, Ctrl+C / Ctrl+V to copy, Delete to remove. Use the bar above the box to change font, size and color. Drag the blue tab to move it, the corner to resize.</div>
+    </div>
+
+    <!-- format + Bible (right) -->
+    <div class="col side">
+      <div class="presentation">
+        <div class="preview" id="pvLive"></div>
+        <div class="btnrow" style="grid-template-columns:repeat(4,1fr)">
+          <button class="btn outline icon" id="bvShow" title="Show this slide on the screen (opens the presentation window)">&#9654;</button>
+          <button class="btn outline icon" id="bvClear" title="Clear the screen">&#10005;</button>
+          <button class="btn outline icon" id="bvRefresh" title="Refresh the screen">&#8635;</button>
+          <button class="btn outline icon" id="bvFull" title="Fullscreen the presentation window (F)">&#9974;</button>
+        </div>
+      </div>
+      <div class="tabs" id="pTabs" style="grid-template-columns:1fr 1fr 1.5fr">
+        <button data-pane="paneFormat" class="on">Format</button>
+        <button data-pane="paneBible">Bible</button>
+        <button data-pane="paneView">Presenter View</button>
+      </div>
+      <div class="tabpane on" id="paneFormat">
+        <div class="scroll" style="flex:1"><div class="custom" id="formatHost"></div></div>
+      </div>
+      <div class="tabpane" id="paneBible">
+        <div class="scroll" style="flex:1"><div class="custom" id="bibleHost"></div></div>
+      </div>
+      <div class="tabpane" id="paneView">
+        <div class="scroll" style="flex:1"><div class="custom"><h4>Presenter View</h4><p class="pnote" id="pvNote"></p><div class="pv-grid" id="pvGrid"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="data/books.js"></script>
+<script src="js/state.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/background.js"></script>
+<script src="js/custompanel.js"></script>
+<script src="js/designs.js"></script>
+<script src="js/slide.js"></script>
+<script>window.SBVC_DECK = 'powerpoint';</script>
+<script src="js/pptx.js"></script>
+<script src="js/preaching.js"></script>
+</body>
+</html>

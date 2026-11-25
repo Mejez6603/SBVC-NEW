@@ -150,5 +150,52 @@
     return { sync: sync, renderBackground: function () { if (bgp) bgp.render(); } };
   }
 
+  /* Makes every section of a panel (an <h4> heading and what follows it, up to the next line or heading)
+   * open and close with a click on the heading. Which ones are closed is remembered per panel name.
+   *   SBVC.makeCollapsible(hostElement, 'hymn-custom');   // call again after the panel is rebuilt
+   */
+  function makeCollapsible(host, name) {
+    var storeKey = 'sbvc-collapsed-' + name;
+    function keyOf(title) { return title.replace(/\d+/g, '#'); } // 'Slide 3 background' and 'Slide 4 background' are one section
+    var closed = {};
+    try { closed = JSON.parse(localStorage.getItem(storeKey)) || {}; } catch (e) { closed = {}; }
+    function remember() { try { localStorage.setItem(storeKey, JSON.stringify(closed)); } catch (e) {} }
+
+    Array.prototype.slice.call(host.children).forEach(function (h) {
+      if (h.tagName !== 'H4' || h.classList.contains('collapsible')) return;
+      var title = h.textContent;
+      var body = el('div', 'sec-body');
+      var n = h.nextSibling;
+      while (n && !(n.nodeType === 1 && (n.tagName === 'H4' || n.tagName === 'HR'))) {
+        var next = n.nextSibling;
+        body.appendChild(n);
+        n = next;
+      }
+      h.parentNode.insertBefore(body, h.nextSibling);
+
+      h.classList.add('collapsible');
+      h.setAttribute('role', 'button');
+      h.tabIndex = 0;
+      h.textContent = '';
+      h.appendChild(el('span', '', title));
+      var chev = el('span', 'chev');
+      chev.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+      h.appendChild(chev);
+
+      function show(isClosed) {
+        body.hidden = isClosed;
+        h.classList.toggle('closed', isClosed);
+        h.setAttribute('aria-expanded', String(!isClosed));
+        h.title = isClosed ? 'Expand ' + title : 'Minimize ' + title;
+      }
+      var key = keyOf(title);
+      function toggle() { closed[key] = !closed[key]; if (!closed[key]) delete closed[key]; remember(); show(!!closed[key]); }
+      h.onclick = toggle;
+      h.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+      show(!!closed[key]);
+    });
+  }
+
   S.createCustomPanel = createCustomPanel;
+  S.makeCollapsible = makeCollapsible;
 })();

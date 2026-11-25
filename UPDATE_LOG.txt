@@ -1,4 +1,4 @@
-﻿SBVC STATIC - UPDATE LOG
+SBVC STATIC - UPDATE LOG
 ========================
 Every change to this folder is recorded here, newest at the BOTTOM.
 Format:  DATE | TIME | TYPE | DESCRIPTION
@@ -89,7 +89,79 @@ DATE        TIME   TYPE    DESCRIPTION
 2026-11-24  07:35  NEW FEATURE  Preaching pictures: add with the Picture button, by dragging picture files onto the slide (drops where you let go), or by copying a picture and pressing Ctrl+V on the page. Pictures keep their shape when resized (hold Shift to stretch), have Fit to slide / Original shape / opacity / front / back, show on the projector, and are saved with the slides. Pictures no longer used are removed from storage automatically.
 
 2026-11-24  07:48  FIX  Preaching: the Tab key now works while typing in a text box (it adds an indent and keeps you in the box; Shift+Tab takes the indent back; also works in the Text field of the Format tab). Before, Tab jumped to the next button and ended the typing.
-2026-11-24  07:48  NEW FEATURE  Preaching: part of a text can now have its own style. Select some words in a box, then use the bar above it: size - / + (or type a number), font, color, bold, italic change ONLY the selected words. With nothing selected the change is for the whole box (and resets earlier part-changes of that kind). Pasting into a box now pastes plain text. Parts keep their style on the projector and after a refresh. A new design recolors parts too (their sizes stay).
+2026-11-24  07:48  NEW FEATURE  Preaching: part of a text can now have its own style. Select some words in a box, then use the bar above it: size - / + (or type a number), font, color, bold, italic change ONLY the selected words. With nothing selected the change is for the whole box (and resets earlier part-changes of that kind). Pasting into a box now pastes plain 
+text. Parts keep their style on the projector and after a refresh. A new design recolors parts too (their sizes stay).
+2026-11-24 2:33 pm Ronigan clone Repo #s
+2026-11-24 8:26PM Update the code on the 1chronicles.js (Ronigan)#
+2026-11-24 10:52PM Update the code on the 1corinthains.js,1john.js,1Kings.js,1Peter.js,1samuel.js (Ronigan)#
+2026-11-25 2:00AM 1chronicles.js is updated 
+
+2026-11-25 2:08AM Clod clone repo
+2026-11-25 2:18AM Update TCB 1chronicles.js (Clod)
+2026-11-25 2:23AM Update 1corinthians.js(Ronigan)
+2026-11-25 2:28AM Update 1john.js on the Brackets(Ronigan)
+2026-11-25 2:35AM Update 1King.js on Brackets (Ronigan)
+2026-11-25 2:38AM Update 1Peter.js on Brackets (Ronigan)
+2026-11-25 2:28AM Update 1samuel.js on Brackets (Ronigan)
+2026-11-25 3:24AM Update 1thessalonians.js, 1timothy.js, 2cronicles.js , 2john.js (Ronigan)
+2026-11-25 3:35AM Update 2kings.js (Ronigan)
+2026-11-25 3:52AM Update 2peter.js , 2samuel.js, 2thessalonians.js, 2timothy.js , 3john.js (Ronigan)
+
+2026-11-25  13:28  CHANGE  Bible controller > Search: results are now shown a page at a time so the browser uses less memory (before, up to 1000 results were drawn at once). New 'Per page' box (1 to 50, default 20, remembered), and a pager with first / previous / page number you can type / next / last, plus a '21-40 of 2720' counter. Changing 'Per page' keeps the first result you were looking at on screen. Each version tab (KJV / ADB / TCB) keeps its own page.
+
+2026-11-25  13:32  CHANGE  Project moved to the GitHub folder SBVC-NEW: the Bible search paging (css/style.css, js/controller.js) was merged in from SBVC_static. The Bible data files were NOT overwritten (the newer edited ones in SBVC-NEW were kept).
+
+2026-11-25  13:39  NEW FEATURE  Hymnals: Design templates and Colors, the same 30 designs and 21 color schemes as the Preaching page (plus your own color pickers), at the top of the right-hand panel. A design sets the screen background (color, gradient or bands) and the hymn title and lyrics fonts and colors; sizes, spacing and alignment stay as you set them. Picking a plain background color or picture afterwards replaces the design background. The designs now live in one shared file, js/designs.js, used by both pages (new: js/designs.js, js/hymndesign.js).
+
+2026-11-25  13:39  FIX  Bible controller: the new search-paging code accidentally reused the name 'pv' and broke the live preview box on the controller page (console error 'pv.render is not a function'). Renamed, preview works again.
+
+2026-11-25  13:42  CHANGE  Hymnals right panel: every section (Design, Colors, Title, Text, Layout) now has a small arrow button on its heading to minimize or expand it. Click the heading or the arrow; which sections you closed is remembered. (New helper SBVC.makeCollapsible in js/custompanel.js.)
+
+2026-11-25  13:46  NEW FEATURE  Bible controller: the same Design (30 designs) and Colors (21 schemes + your own pickers) as Hymnals/Preaching, at the top of the right panel, and every section (Design, Colors, Title, Text, Layout, Background) can be minimized/expanded with its arrow. A design sets the screen background and the verse reference / verse text fonts and colors; sizes and alignment stay. The screen background is shared between the Bible and Hymnals pages, so a design's background shows on both (their fonts/colors stay separate). The design panel code is now js/designpanel.js (was js/hymndesign.js).
+
+2026-11-25  13:50  CHANGE  Preaching: every section of the Format panel (Design, Colors, Slide background, Text box, Position & size, Picture ...) and the Bible tab now has an arrow on its heading to minimize or expand it; closed sections are remembered. 'Slide 2 background' and 'Slide 3 background' count as the same section.
+
+2026-11-25  13:51  FIX  Design > Colors: the color boxes in 'Or make your own colors' now line up on one row even when a label (like 'Accent (verse reference)') wraps to two lines (css/style.css).
+
+2026-11-25  13:54  FIX  Design > Colors list (Preaching, Hymnals, Bible controller): choosing a color scheme further down the list (Black Tie, Foundry...) no longer jumps the list back to the top; the list and the panel stay where you scrolled.
+
+2026-11-25  13:58  CHANGE  Preaching: every box on the slide now shows its blue resize corner all the time, so you can resize any box without clicking it first (dragging the corner also selects that box). The move tab and outline still appear only on the selected box. The corner is hidden while you type in that box.
+
+2026-11-25  13:59  CHANGE  Preaching: the blue resize corner now stays visible while you type in a box too (before, it was hidden during typing). Dragging it while typing saves the text and resizes the box.
+
+2026-11-25  14:01  CHANGE  Preaching: the blue resize corners are hidden when no box is selected (a clean slide). As soon as a box is selected or being typed in, every box shows its resize corner.
+
+2026-11-25  14:04  NEW FEATURE  Preaching: overall Undo / Redo. Ctrl+Z undoes and Ctrl+Y (or Ctrl+Shift+Z) redoes the last change on the slides: typed text (even after you clicked away from the box), moving and resizing, adding or deleting boxes and slides, pasting, designs and colors. Quick changes in a row (typing, dragging) count as one step; up to 50 steps are kept. While you are typing inside a box, Ctrl+Z still undoes the typing itself, as before. New Undo / Redo buttons in the toolbar. Pictures stay in storage while an undo step can bring them back.
+
+2026-11-25  14:10  NEW FEATURE  Preaching: every shape (except the line) has its own text inside, so you do not need an extra text box. Select a shape and just start typing, or click an already selected shape again (a first click only selects it). While typing, the bar above becomes the text bar (font, size, color, bold, italic, alignment; select some words to style only those). The text color is automatic (white on a dark fill, dark on a light fill) until you pick one. A 'Text inside the shape' box also appears in the Format panel. Text in shapes follows the design font, shows on the projector and thumbnails, and works with Undo, copy and paste. (js/slide.js, js/preaching.js)
+
+2026-11-25  14:16  NEW FEATURE  Preaching: edit a picture on the slide. Select a picture and use the bar above it or the Format panel: Crop (a frame with 8 handles appears over the whole picture; drag the edges or move the frame, then Done / Enter, or Esc to cancel), Turn left / right, Flip left-right / up-down, cut to a shape (rounded corners or oval / circle), and Reset picture to get the whole original back. The original picture is never changed (crop, turn, flip and shape are only remembered on the slide), so you can crop again later; works with Undo, copy/paste, thumbnails and the projector. (js/slide.js, js/preaching.js, css/style.css)
+
+2026-11-25  14:20  FIX  Preaching copy / paste: with a picture, text box or shape selected, Ctrl+C / Ctrl+X / Ctrl+V / Ctrl+D now copy, cut, paste and duplicate THAT box (before, they copied the whole slide). A pasted box lands on the current slide, a little off the original when it would sit exactly on top. With no box selected they still copy / paste whole slides. The clipboard is now kept in browser storage, so it also works after a refresh and between tabs, and a copied or cut picture is kept even if its slide is deleted.
+
+2026-11-25  14:25  FIX  Preaching copy / paste: a picture copied earlier in another program (still on the system clipboard) was pasted instead of the slide or picture you had just copied inside the app, so duplicating a slide or copying a picture to another slide pasted the wrong picture. Copy / Cut inside the slides now also replace the system clipboard (with a small marker), so Ctrl+V always pastes what you copied last. A picture copied from outside still pastes normally when it is the last thing you copied.
+
+2026-11-25  14:30  CHANGE  Preaching, presenting like PowerPoint's presenter view: while the screen is live it now STAYS on its own slide while you edit or click other slides (before, it followed whatever slide you selected, so the audience saw your editing). The screen changes only when you press 'Show this slide' (the Present button while live), double-click a slide in the left list, or use the new Screen arrows in the toolbar (Alt + Left / Alt + Right). The toolbar says 'LIVE: slide N' and the slide on the screen has a red outline and dot in the list. Editing the slide that is on the screen still updates it live. Clear stops the screen as before.
+
+2026-11-25  12:00  NEW FEATURE  Preaching: presenter view strip while a slide is live - shows what is on the screen and the next slide (updates as you edit), with Screen back / Screen forward buttons; the Screen arrows moved from the toolbar into this strip (preaching.html, js/preaching.js, css/style.css)
+
+2026-11-25  12:40  CHANGE  Preaching: the presenter strip above the slide is replaced by a new 'Presenter View' tab in the right panel - all slides shown 2 per row, click a slide to show it on present.html (the one on screen is marked red); Screen back/forward buttons removed (Alt+Left/Right still step the screen) (preaching.html, js/preaching.js, css/style.css)
+
+2026-11-25  13:30  NEW FEATURE  New 'PowerPoint' tab in the top menu (powerpoint.html): the same slide editor as Preaching but with its own separate slides, for other presentations (details, introduction, announcements ...). Shows on present.html the same way; pictures are shared with Preaching. js/preaching.js now runs both pages (window.SBVC_DECK), js/present.js, js/state.js (pptDeck/pptLive keys) and js/nav.js updated
+
+2026-11-25  15:10  NEW FEATURE  Live mode: new Local / Live button at the top right of every page (js/live.js, css/style.css, js/nav.js). Local = nothing leaves the computer. Live = Share my session behind a key, or Join with that key; the helper can edit and control everything (Bible, Hymnals, Preaching, PowerPoint) and the host's projector follows. Direct browser-to-browser link (PeerJS 1.5.4 loaded from unpkg, free PeerJS broker only introduces the two computers); needs internet on both; Hymnals library videos are not sent. A helper's own data is backed up when joining and restored on Leave. js/state.js: applyRemote + live hook; js/preaching.js: reloads slides when a remote change arrives. Tested with two origins (localhost and 127.0.0.1): join, edit both ways, live slide, leave+restore all worked
+
+2026-11-25  15:40  NEW FEATURE  Live chat: while Local/Live is set to Live, a chat button appears bottom-right on every page (unread badge). Everyone in the session can send text, pictures (shrunk to 900 px) and small files up to 1.5 MB (attach button, paste or drag onto the window); each person can set a display name. Chat history is kept only in this browser while Live and is cleared when going Local (js/live.js, css/style.css). Tested host <-> helper with text + picture
+
+2026-11-25  17:00  SECURITY  Live mode hardened (js/live.js, css/style.css, js/vendor/peerjs.min.js + README.txt): (1) host must ALLOW every helper (name shown; Deny / Block); (2) roles per helper - View only / Control only (screen only) / Full edit, changeable live, tampered clients are refused and put back; (3) host panel: helper list with Remove / Block, Lock session, clear blocked list, idle helpers dropped, rate limits; (4) everything that arrives is checked - known keys only, size limits, no scripts or outside web links in styles, only png/jpg/webp/gif pictures, chat files limited to documents up to 1 MB, host stamps chat names; (5) restore point saved when the first helper joins ('Put them back'); (6) PeerJS 1.5.4 now kept in js/vendor (92,865 bytes, SHA-256 in README) instead of loading from unpkg; (7) activity log (joins, changes, refused attempts). Keys are now 12+ characters. Moving between pages needs no new approval (pass kept in the helper's browser)
+
+2026-11-25  17:40  NEW FEATURE  Preaching and PowerPoint: preview screen at the top of the right panel (same look as the Bible controller and Hymnals) showing what is on the projector, with buttons Show this slide, Clear, Refresh and Fullscreen; it follows edits of the live slide (preaching.html, powerpoint.html, js/preaching.js)
+
+2026-11-25  18:10  NEW FEATURE  Preaching and PowerPoint: Export and Import buttons in the toolbar. Export saves all slides (with their pictures, design and colors) to one file, SBVC-Preaching-DATE.sbvc.json / SBVC-PowerPoint-DATE.sbvc.json. Import asks 'Add after my slides' or 'Replace all my slides' (Ctrl+Z undoes a replace); files are checked first (SBVC slides only, max 300 slides / 25 MB, no scripts or outside web links, only png/jpg/webp/gif pictures). A file from one page can be imported into the other (preaching.html, powerpoint.html, js/preaching.js, css/style.css)
+
+2026-11-25  18:40  NEW FEATURE  Preaching and PowerPoint: Export now offers a real PowerPoint file (.pptx) as well as the SBVC file, and Import opens .pptx files (new js/pptx.js; PptxGenJS 3.12.0 and JSZip 3.10.1 saved in js/vendor, loaded only when used). Import is best effort: text, shapes, pictures and backgrounds come across; animations, charts, SmartArt, videos and gradient shapes do not, tables become text. Gradient designs export as a picture background. Checked: round trip keeps positions and sizes, import dialog works (preaching.html, powerpoint.html, js/pptx.js, js/preaching.js, js/vendor)
+
+2026-11-25  19:10  NEW  Project documents for GitHub: README.md (overview, features, technologies, getting started, usage, structure, packaging, future enhancements, changelog, requirements, troubleshooting, acknowledgment), LICENSE (MIT), CODE_OF_CONDUCT.md and SECURITY.md (new files, no program change)
 
 HOW TO ADD A NEW ENTRY
 ----------------------

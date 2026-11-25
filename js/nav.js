@@ -4,6 +4,7 @@
     ['controller.html', 'SBVC'],
     ['hymnals.html', 'Hymnals'],
     ['preaching.html', 'Preaching'],
+    ['powerpoint.html', 'PowerPoint'],
     ['about.html', 'About']
   ];
   var here = location.pathname.split('/').pop() || 'index.html';
@@ -18,4 +19,16 @@
     nav.appendChild(a);
   });
   host.appendChild(nav);
+
+  // Live button (top right): Local or Live. Its code (js/live.js) loads after the page has started.
+  if (window.SBVC) {
+    var lb = document.createElement('button');
+    lb.type = 'button'; lb.id = 'liveBtn'; lb.className = 'livebtn';
+    lb.title = 'Local / Live: let another computer help remotely';
+    lb.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4M19 5a10 10 0 0 1 0 14M5 19a10 10 0 0 1 0-14"/></svg><span class="livetxt">Local</span><i class="livedot2"></i>';
+    host.appendChild(lb);
+    var ls = document.createElement('script');
+    ls.src = 'js/live.js';
+    document.body.appendChild(ls);
+  }
 })();

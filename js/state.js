@@ -18,11 +18,16 @@
     playback: 'sbvc-media-playback-state',
     bgImages: 'sbvc-bg-images',   // list of custom background pictures [{id, name, url}] (url = small JPEG data URL)
     bgImage: 'sbvc-bg-image',     // id of the picture in use, or empty
+    bgCss: 'sbvc-bg-css',         // background layers of a chosen Hymnals design (gradient / bands), or empty
+    hymnDesign: 'sbvc-hymnals-design', // the Hymnals design in use {theme, colorScheme, customColors}
+    bibleDesign: 'sbvc-bible-design', // the Bible controller design in use {theme, colorScheme, customColors}
     hymnUi: 'sbvc-hymnals-ui',    // what you had open on the Hymnals page (search, hymn, verse, tab)
     ctrlUi: 'sbvc-controller-ui', // what you had open on the Bible controller (version, verse, search, tab)
     preachDeck: 'sbvc-preaching-deck', // the Preaching slides {slides:[...], current, tab}
     preachLive: 'sbvc-preaching-live', // index of the slide on the projector, or empty
-    preachImages: 'sbvc-preaching-images' // pictures placed on Preaching slides {imageId: small data URL}
+    preachImages: 'sbvc-preaching-images', // pictures placed on Preaching and PowerPoint slides {imageId: small data URL}
+    pptDeck: 'sbvc-powerpoint-deck', // the PowerPoint page's own slides {slides:[...], current, tab}
+    pptLive: 'sbvc-powerpoint-live' // index of the PowerPoint slide on the projector, or empty
   };
 
   var DEFAULT_CUSTOM = {
@@ -39,6 +44,8 @@
   };
 
   var listeners = [];
+  var liveHook = null;     // js/live.js: told about every local write so it can send it to the other computer
+  var fromRemote = false; // true while a change that arrived from the other computer is being written
 
   function getRaw(key) {
     try { return localStorage.getItem(key); } catch (e) { return null; }
@@ -48,7 +55,12 @@
       if (value === null || value === undefined) localStorage.removeItem(key);
       else localStorage.setItem(key, value);
     } catch (e) { console.error('localStorage write failed', e); }
+    if (liveHook && !fromRemote) { try { liveHook(key, value === undefined ? null : value); } catch (e) { console.error(e); } }
     emit(key); // storage events only reach OTHER windows, so notify this one too
+  }
+  function applyRemote(key, value) { // write something that came from the other computer (not sent back)
+    fromRemote = true;
+    try { setRaw(key, value); } finally { fromRemote = false; }
   }
   function getJSON(key, fallback) {
     var raw = getRaw(key);
@@ -104,10 +116,11 @@
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i].url;
     return null;
   }
-  function applyBackground(node, useImage) {
+  function applyBackground(node, useImage, useDesign) {
     node.style.backgroundColor = getRaw(KEYS.bg) || '#000000';
     var url = useImage ? getBgImageUrl() : null;
-    node.style.backgroundImage = url ? 'url("' + url + '")' : 'none';
+    var css = useDesign ? getRaw(KEYS.bgCss) : null; // a Hymnals design's gradient / bands, drawn under a picture
+    node.style.backgroundImage = url ? 'url("' + url + '")' : (css || 'none');
     node.style.backgroundSize = 'cover';
     node.style.backgroundPosition = 'center';
     node.style.backgroundRepeat = 'no-repeat';
@@ -198,6 +211,8 @@
     DEFAULT_CUSTOM: DEFAULT_CUSTOM,
     getRaw: getRaw, setRaw: setRaw, getJSON: getJSON, setJSON: setJSON,
     onChange: onChange,
+    applyRemote: applyRemote,
+    setLiveHook: function (fn) { liveHook = fn; },
     getCustom: getCustom, setCustom: setCustom, resetCustom: resetCustom,
     fontFamily: fontFamily,
     syncVideo: syncVideo,
