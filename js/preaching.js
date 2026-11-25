@@ -121,9 +121,11 @@
   }
 
   var saveTimer = null;
+  var lastDeckRaw = null; // what this page last saved (to tell its own saves from changes sent by a remote helper)
+  function writeDeck() { lastDeckRaw = JSON.stringify(deck); S.setRaw(DK.deck, lastDeckRaw); }
   function saveNow() {
     clearTimeout(saveTimer); saveTimer = null;
-    S.setJSON(DK.deck, deck);
+    writeDeck();
     recordHistory();
   }
   function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 150); }
@@ -163,7 +165,7 @@
     picked = {};
     if (!curEl()) selId = null;
     lastSnap = s; lastChange = 0;
-    S.setJSON(DK.deck, deck); // saved without making a new history step
+    writeDeck(); // saved without making a new history step
     updateUndoButtons();
     pushLive(); drawSlideList(); drawCanvas(); buildFormat();
   }
@@ -1510,6 +1512,29 @@
 
   S.onChange(function (key) {
     if (key === K.bgImages) { drawCanvas(); drawSlideList(); if (!curEl()) buildFormat(); }
+    // Live mode: a helper on another computer changed the slides or the slide on the screen
+    if (key === DK.deck) {
+      var raw = S.getRaw(DK.deck);
+      if (raw === null || raw === lastDeckRaw) return;
+      var nd; try { nd = JSON.parse(raw); } catch (e) { return; }
+      if (!nd || !Array.isArray(nd.slides) || !nd.slides.length) return;
+      if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+      if (endEdit) endEdit();
+      var keepId = cur() && cur().id, keepSel = selId;
+      deck = nd; lastDeckRaw = raw;
+      var at = -1; deck.slides.forEach(function (s, i) { if (s.id === keepId) at = i; });
+      deck.current = at >= 0 ? at : clamp(parseInt(deck.current, 10) || 0, 0, deck.slides.length - 1);
+      picked = {}; selId = curEl() && keepSel && at >= 0 ? keepSel : null; if (!curEl()) selId = null;
+      lastSnap = snap();
+      pushLive(); drawSlideList(); drawCanvas(); buildFormat();
+    } else if (key === DK.live) {
+      var lr = S.getRaw(DK.live), li = liveIndex();
+      if (lr !== (li < 0 ? null : String(li))) {
+        var ix = lr === null || lr === '' ? NaN : parseInt(lr, 10);
+        liveId = deck.slides[ix] ? deck.slides[ix].id : null;
+        pushLive();
+      }
+    }
   });
 
   /* ------------------------------------------------------------------ *

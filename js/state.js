@@ -44,6 +44,8 @@
   };
 
   var listeners = [];
+  var liveHook = null;     // js/live.js: told about every local write so it can send it to the other computer
+  var fromRemote = false; // true while a change that arrived from the other computer is being written
 
   function getRaw(key) {
     try { return localStorage.getItem(key); } catch (e) { return null; }
@@ -53,7 +55,12 @@
       if (value === null || value === undefined) localStorage.removeItem(key);
       else localStorage.setItem(key, value);
     } catch (e) { console.error('localStorage write failed', e); }
+    if (liveHook && !fromRemote) { try { liveHook(key, value === undefined ? null : value); } catch (e) { console.error(e); } }
     emit(key); // storage events only reach OTHER windows, so notify this one too
+  }
+  function applyRemote(key, value) { // write something that came from the other computer (not sent back)
+    fromRemote = true;
+    try { setRaw(key, value); } finally { fromRemote = false; }
   }
   function getJSON(key, fallback) {
     var raw = getRaw(key);
@@ -204,6 +211,8 @@
     DEFAULT_CUSTOM: DEFAULT_CUSTOM,
     getRaw: getRaw, setRaw: setRaw, getJSON: getJSON, setJSON: setJSON,
     onChange: onChange,
+    applyRemote: applyRemote,
+    setLiveHook: function (fn) { liveHook = fn; },
     getCustom: getCustom, setCustom: setCustom, resetCustom: resetCustom,
     fontFamily: fontFamily,
     syncVideo: syncVideo,

@@ -370,3 +370,63 @@ body:has(> .app), body:has(> .page) { overflow: hidden; }
 .pv-num { font-size: 11px; font-weight: 600; color: var(--muted-foreground); margin-top: 3px; text-align: center; }
 .pv-item.islive .pv-num { color: #ef4444; }
 .pv-item.islive .pv-num::after { content: " \00b7 on screen"; }
+
+/* ---------- Live button (top right) + panel ---------- */
+.livebtn { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 10px; border-radius: 14px; cursor: pointer; font: inherit; font-size: 13px; color: var(--muted-foreground); background: transparent; border: 1px solid var(--border); }
+.livebtn:hover, .livebtn.open { color: var(--foreground); background: hsl(217 33% 14%); }
+.livedot2 { width: 8px; height: 8px; border-radius: 50%; background: #64748b; }
+.livebtn.s-host .livedot2 { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+.livebtn.s-guest .livedot2 { background: #3b82f6; box-shadow: 0 0 6px #3b82f6; }
+.livebtn.s-connecting .livedot2 { background: #f59e0b; }
+.livebtn.s-error .livedot2 { background: #ef4444; }
+.livebtn.s-host, .livebtn.s-guest { color: var(--foreground); }
+.livepanel { position: fixed; top: 44px; right: 12px; width: 300px; z-index: 200; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: hsl(222 40% 8%); box-shadow: 0 10px 30px rgba(0,0,0,.5); font-size: 13px; }
+.livepanel[hidden] { display: none; }
+.lv-head { font-weight: 600; margin-bottom: 8px; }
+.lv-seg, .lv-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; border-radius: 8px; background: hsl(217 33% 12%); margin-bottom: 10px; }
+.lv-seg button, .lv-tabs button { height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--muted-foreground); font: inherit; cursor: pointer; }
+.lv-seg button.on, .lv-tabs button.on { background: var(--foreground); color: var(--background); font-weight: 600; }
+.lv-p { margin: 8px 0; color: var(--muted-foreground); line-height: 1.4; }
+.lv-p b { color: var(--foreground); }
+.lv-small { font-size: 11px; }
+.lv-warn { color: #fbbf24; }
+.lv-row { display: flex; gap: 6px; }
+.lv-row input { flex: 1; min-width: 0; height: 32px; padding: 0 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--background); color: var(--foreground); font: 600 14px/1 monospace; letter-spacing: .06em; }
+.lv-row button { height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--foreground); font: inherit; cursor: pointer; }
+.lv-go { width: 100%; height: 34px; margin-top: 6px; border: 0; border-radius: 6px; background: var(--foreground); color: var(--background); font: inherit; font-weight: 600; cursor: pointer; }
+.lv-go.stop { background: #b91c1c; color: #fff; }
+.lv-state { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; margin-bottom: 8px; border-radius: 8px; background: hsl(217 33% 12%); border-left: 3px solid #64748b; }
+.lv-state span { color: var(--muted-foreground); font-size: 12px; }
+.lv-state.s-host { border-left-color: #22c55e; }
+.lv-state.s-guest { border-left-color: #3b82f6; }
+.lv-state.s-connecting { border-left-color: #f59e0b; }
+.lv-state.s-error { border-left-color: #ef4444; }
+
+/* ---------- Live chat ---------- */
+.lc-fab { position: fixed; right: 16px; bottom: 16px; z-index: 210; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--border); background: hsl(217 33% 16%); color: var(--foreground); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+.lc-fab:hover { background: hsl(217 33% 22%); }
+.lc-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: #ef4444; color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
+.lc-badge[hidden] { display: none; }
+.lc-win { position: fixed; right: 16px; bottom: 72px; z-index: 210; width: 330px; height: 440px; max-height: calc(100vh - 100px); display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; background: hsl(222 40% 8%); box-shadow: 0 10px 30px rgba(0,0,0,.55); font-size: 13px; overflow: hidden; }
+.lc-win[hidden] { display: none; }
+.lc-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.lc-head b { flex: 1; white-space: nowrap; }
+.lc-name { width: 100px; flex-shrink: 0; height: 26px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--background); color: var(--foreground); font: inherit; font-size: 12px; }
+.lc-x { width: 26px; height: 26px; border: 0; border-radius: 6px; background: transparent; color: var(--muted-foreground); font-size: 18px; cursor: pointer; }
+.lc-x:hover { color: var(--foreground); background: hsl(217 33% 16%); }
+.lc-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.lc-empty { margin: auto; color: var(--muted-foreground); text-align: center; padding: 0 20px; }
+.lc-msg { max-width: 85%; align-self: flex-start; padding: 6px 9px; border-radius: 10px; background: hsl(217 33% 15%); }
+.lc-msg.mine { align-self: flex-end; background: hsl(217 70% 32%); }
+.lc-who { font-size: 10.5px; color: var(--muted-foreground); margin-bottom: 2px; }
+.lc-msg.mine .lc-who { color: hsl(214 60% 85%); }
+.lc-text { white-space: pre-wrap; word-break: break-word; }
+.lc-img { display: block; max-width: 100%; max-height: 160px; margin-top: 4px; border-radius: 6px; cursor: zoom-in; }
+.lc-img.big { max-height: none; cursor: zoom-out; }
+.lc-file { display: block; margin-top: 4px; color: #93c5fd; word-break: break-all; }
+.lc-note { min-height: 0; padding: 0 10px; color: #fbbf24; font-size: 11px; }
+.lc-note:not(:empty) { padding-bottom: 4px; }
+.lc-bar { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--border); }
+.lc-bar input { flex: 1; min-width: 0; height: 32px; padding: 0 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--background); color: var(--foreground); font: inherit; }
+.lc-att, .lc-send { height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--foreground); font: inherit; cursor: pointer; }
+.lc-send { background: var(--foreground); color: var(--background); font-weight: 600; border-color: transparent; }
