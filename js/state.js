@@ -206,7 +206,53 @@
     return bookPromises[key];
   }
 
+  // ---- Bible verse / hymn text: drawn on a fixed 1280 x 720 stage, then scaled as a whole, so the projector
+  // and the small previews always look the same (line breaks, sizes, spacing, dragged positions).
+  function passageStage(passage, c) {
+    function line(tag, text, font, size, color, pos) {
+      var n = document.createElement(tag);
+      n.textContent = text;
+      n.style.fontFamily = fontFamily(font);
+      n.style.fontSize = size + 'rem';
+      n.dataset.size = size;
+      n.style.color = color;
+      n.style.textAlign = c.textAlign;
+      n.style.transform = 'translate(' + pos.x + 'px,' + pos.y + 'px)';
+      return n;
+    }
+    var stage = document.createElement('div');
+    stage.className = 'pstage';
+    stage.style.paddingLeft = stage.style.paddingRight = c.horizontalPadding + 'rem';
+    var h = line('h1', passage.reference, c.titleFontFamily, c.titleFontSize, c.titleColor, c.positions.title);
+    var p = line('p', passage.text, c.fontFamily, c.fontSize, c.textColor, c.positions.text);
+    p.style.lineHeight = c.lineHeight;
+    stage.appendChild(h);
+    stage.appendChild(p);
+    return { stage: stage, title: h, text: p };
+  }
+  // a very long verse is made smaller until all of it is on the screen (your chosen size is not changed)
+  function shrinkToFit(stage) {
+    var h = stage.querySelector('h1'), p = stage.querySelector('p');
+    if (!h || !p) return;
+    function apply(k) { [h, p].forEach(function (n) { n.style.fontSize = (n.dataset.size * k) + 'rem'; }); }
+    var k = 1;
+    apply(k);
+    while (k > 0.3 && h.offsetHeight + 16 + p.offsetHeight > 688) { k -= 0.03; apply(k); }
+  }
+  // scale a stage (already on the page) to fit a w x h box, centered; returns the scale
+  function fitStage(stage, w, h) {
+    shrinkToFit(stage);
+    // the font may still be loading on the first draw: measure again once it has arrived
+    if (document.fonts && document.fonts.status === 'loading') document.fonts.ready.then(function () { shrinkToFit(stage); });
+    var s = Math.min(w / 1280, h / 720);
+    stage.style.left = ((w - 1280 * s) / 2) + 'px';
+    stage.style.top = ((h - 720 * s) / 2) + 'px';
+    stage.style.transform = 'scale(' + s + ')';
+    return s;
+  }
+
   window.SBVC = {
+    passageStage: passageStage, fitStage: fitStage,
     KEYS: KEYS,
     DEFAULT_CUSTOM: DEFAULT_CUSTOM,
     getRaw: getRaw, setRaw: setRaw, getJSON: getJSON, setJSON: setJSON,

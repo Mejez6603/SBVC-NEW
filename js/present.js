@@ -51,7 +51,7 @@
     var c = S.getCustom(customKey);
     // background color, or your own picture if one is chosen
     S.applyBackground(screenEl, true, true);
-    screenEl.style.paddingLeft = screenEl.style.paddingRight = c.horizontalPadding + 'rem';
+    screenEl.style.paddingLeft = screenEl.style.paddingRight = media ? c.horizontalPadding + 'rem' : '0';
     screenEl.textContent = '';
     video = null;
 
@@ -80,29 +80,10 @@
       return;
     }
 
-    var wrap = document.createElement('div');
-    wrap.className = 'wrap';
-
-    var h = document.createElement('h1');
-    h.textContent = passage.reference;
-    h.style.fontFamily = S.fontFamily(c.titleFontFamily);
-    h.style.fontSize = c.titleFontSize + 'rem';
-    h.style.color = c.titleColor;
-    h.style.textAlign = c.textAlign;
-    h.style.transform = 'translate(' + c.positions.title.x + 'px,' + c.positions.title.y + 'px)';
-
-    var p = document.createElement('p');
-    p.textContent = passage.text;
-    p.style.fontFamily = S.fontFamily(c.fontFamily);
-    p.style.fontSize = c.fontSize + 'rem';
-    p.style.lineHeight = c.lineHeight;
-    p.style.color = c.textColor;
-    p.style.textAlign = c.textAlign;
-    p.style.transform = 'translate(' + c.positions.text.x + 'px,' + c.positions.text.y + 'px)';
-
-    wrap.appendChild(h);
-    wrap.appendChild(p);
-    screenEl.appendChild(wrap);
+    var made = S.passageStage(passage, c);
+    screenEl.style.position = 'relative';
+    screenEl.appendChild(made.stage);
+    S.fitStage(made.stage, window.innerWidth, window.innerHeight);
   }
 
   function syncMedia() { if (video) S.syncVideo(video); }
@@ -150,7 +131,11 @@
     queued = true;
     setTimeout(function () { queued = false; render(); }, 0);
   }
-  window.addEventListener('resize', function () { if (isSlides()) renderPreaching(); });
+  window.addEventListener('resize', function () {
+    if (isSlides()) { renderPreaching(); return; }
+    var st = screenEl.querySelector('.pstage');
+    if (st) S.fitStage(st, window.innerWidth, window.innerHeight);
+  });
 
   // The audience cannot select, copy, drag or right-click the text.
   ['selectstart', 'copy', 'cut', 'dragstart', 'contextmenu'].forEach(function (type) {

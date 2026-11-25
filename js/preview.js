@@ -73,10 +73,9 @@
       var screenKey = t === 'hymnal' ? K.hymnCustom : K.custom;
       var passage = S.getJSON(K.passage, null);
       var c = S.getCustom(screenKey);
-      var sc = scale();
 
       S.applyBackground(container, true, true);
-      container.style.paddingLeft = container.style.paddingRight = (c.horizontalPadding * sc) + 'rem';
+      container.style.paddingLeft = container.style.paddingRight = media ? (c.horizontalPadding * scale()) + 'rem' : '0';
 
       if (media) {
         var v = el('video');
@@ -99,29 +98,15 @@
         return;
       }
 
-      var h = el('h1', '', passage.reference);
-      h.style.fontFamily = S.fontFamily(c.titleFontFamily);
-      h.style.fontSize = (c.titleFontSize * sc) + 'rem';
-      h.style.color = c.titleColor;
-      h.style.textAlign = c.textAlign;
-      h.style.transform = 'translate(' + (c.positions.title.x * sc) + 'px,' + (c.positions.title.y * sc) + 'px)';
-
-      var p = el('p', '', passage.text);
-      p.style.fontFamily = S.fontFamily(c.fontFamily);
-      p.style.fontSize = (c.fontSize * sc) + 'rem';
-      p.style.lineHeight = c.lineHeight;
-      p.style.color = c.textColor;
-      p.style.textAlign = c.textAlign;
-      p.style.transform = 'translate(' + (c.positions.text.x * sc) + 'px,' + (c.positions.text.y * sc) + 'px)';
-
+      var made = S.passageStage(passage, c);
       if (screenKey === customKey) {
-        makeDraggable(h, 'title');
-        makeDraggable(p, 'text');
+        makeDraggable(made.title, 'title');
+        makeDraggable(made.text, 'text');
       } else {
-        h.style.cursor = p.style.cursor = 'default';
+        made.stage.classList.add('fixed');
       }
-      container.appendChild(h);
-      container.appendChild(p);
+      container.appendChild(made.stage);
+      S.fitStage(made.stage, container.clientWidth || 318, container.clientHeight || 179);
     }
 
     function syncMedia() { if (video) S.syncVideo(video); }
@@ -137,7 +122,7 @@
       node.addEventListener('pointermove', function (e) {
         if (!dragging || dragging.which !== which) return;
         var dx = e.clientX - dragging.sx, dy = e.clientY - dragging.sy;
-        node.style.transform = 'translate(' + (dragging.ox * dragging.scale + dx) + 'px,' + (dragging.oy * dragging.scale + dy) + 'px)';
+        node.style.transform = 'translate(' + (dragging.ox + dx / dragging.scale) + 'px,' + (dragging.oy + dy / dragging.scale) + 'px)';
       });
       function end(e) {
         if (!dragging || dragging.which !== which) return;
