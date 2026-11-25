@@ -1,6 +1,5 @@
 (window.SBVC_BIBLE=window.SBVC_BIBLE||{})["tcb/1chronicles"]=
-{
-  "1": {
+{"1": {
     "1": "Ito ang mga lahi mula kay Adan: sina Set, Enosh,",
     "2": "Kenan, Mahalalel, Jared,",
     "3": "Enoc, Matusalem, Lamec,",

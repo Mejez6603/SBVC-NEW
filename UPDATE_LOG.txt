@@ -167,7 +167,15 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 =======
 2026-11-25 6:12PM Update acts.js (Ronigan)
 2026-11-25 16:52 Update TCB 1chronicles.js (Clod)
->>>>>>> c27a32e0d9167476815c0ee46d9c9c7372440f0a
+2026-11-25 16:52 Update TCB 1chronicles.js (Clod)
+2026-11-25 16:56 Update TCB 1corinthians.js (Clod)
+2026-11-25 16:59 Update TCB 1john.js (Clod)
+2026-11-25 17:02 Update TCB 1king.js (Clod)
+2026-11-25 17:04 Update TCB 1peter.js (Clod)
+2026-11-25 17:06 Update TCB 1samuel.js (Clod)
+2026-11-25 17:08 Update TCB 1thessalonians.js (Clod)
+2026-11-25 17:11 Update TCB 1timothy.js (Clod)
+
 
 HOW TO ADD A NEW ENTRY
 ----------------------
