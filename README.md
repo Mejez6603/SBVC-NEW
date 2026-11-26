@@ -23,6 +23,11 @@ SBVC is the static (plain web files) version of an earlier Next.js project.
 - **Live mode** – share a deck with a key so a helper can join remotely and edit or control it (peer-to-peer over WebRTC). Includes host approval, view / control / edit roles, host controls, a restore point, an activity log and a **live chat** (text, pictures and small files).
 - **Remembers your work** – slides, notes and settings survive a refresh or closing the tab.
 - **The screen stays put** – switching between the Bible, Hymnals, Preaching and PowerPoint pages does not change the projector; it changes only when you click a new verse, hymn line, video or slide (or press Clear).
+- **Keyboard and clicker control** – arrow keys or Page Up / Page Down (what presentation clickers send) move to the next or previous Bible verse or hymn part, and Page Up / Down move the slide on the screen.
+- **Smooth video** – while the Presentation window is open, it plays the video's sound, so changing controller pages does not pause the video. The **Now Playing** box (play / pause, position, volume, Stop) follows you between the controller pages.
+- **Backup and restore** – the **Backup** button saves everything (slides, pictures, styles, hymn list, notes and videos) to one file and brings it back.
+- **43 font choices** – every font menu is in A–Z order and shows each name with a sample written in that font: sans serif, slab serif, rounded, serif, headline, script / handwriting, monospaced and Futura style. *Futura* uses the copy installed on your computer; if there is none, the free lookalike Jost is shown.
+- **Works offline** – fonts and code libraries are inside the project; only Live mode needs the internet.
 - **Safe projector screen** – text on the presentation window cannot be selected, dragged or right-clicked.
 
 ## Technologies Used
@@ -69,7 +74,9 @@ python -m http.server 8765
 3. **Hymnals** – search a hymn, add it to the queue, project a verse or the whole hymn.
 4. **Preaching / PowerPoint** – build slides, then click **Present** (or click a slide in **Presenter View**).
 5. **Export / Import** – use the toolbar buttons; Export asks for an SBVC file or a PowerPoint file, Import asks *Add after my slides* or *Replace all my slides* (Ctrl+Z undoes a replace).
-6. **Live mode** – click the **Local / Live** button at the top right. The host shares a key; the helper enters it to join. The host approves each person and chooses their role.
+6. **Keys and clicker** – once something is on the screen, press → / ↓ / Page Down for the next verse or hymn part, ← / ↑ / Page Up for the previous one. It also works while the Presentation window is in front, as long as that page is open in the controller window. In Preaching and PowerPoint use Page Up / Down (the arrow keys edit slides there).
+7. **Backup** – click **Backup** (top right) before big changes or to move to another computer.
+8. **Live mode** – click the **Local / Live** button at the top right. The host shares a key; the helper enters it to join. The host approves each person and chooses their role.
 
 ## Project Structure
 
@@ -88,7 +95,9 @@ SBVC-NEW/
 │   └── style.css
 ├── js/
 │   ├── state.js        Shared state and the localStorage channel
-│   ├── nav.js          Top menu and Live button
+│   ├── nav.js          Top menu, Backup and Live buttons
+│   ├── backup.js       Back up everything / restore
+│   ├── player.js       Video controls on every controller page
 │   ├── controller.js   Bible controller logic
 │   ├── hymnals.js      Hymnals logic
 │   ├── preaching.js    Slide editor (used by Preaching and PowerPoint)
@@ -97,6 +106,7 @@ SBVC-NEW/
 │   ├── live.js         Live mode, chat and security
 │   ├── pptx.js         .pptx export and import
 │   └── vendor/         PeerJS, PptxGenJS, JSZip (+ README with checksums)
+├── fonts/              The fonts, saved locally (+ README)
 ├── data/
 │   ├── bible/          kjv, adb, tcb (one file per book)
 │   ├── hymns/          English and Tagalog hymns
@@ -109,7 +119,7 @@ SBVC-NEW/
 
 SBVC has no build step, so "packaging" is just copying the folder:
 
-1. Make sure the folder contains everything above (especially `data/` and `js/vendor/`).
+1. Make sure the folder contains everything above (especially `data/`, `fonts/` and `js/vendor/`).
 2. Zip the **SBVC-NEW** folder (leave out the `.git` folder).
 3. On the target computer, unzip it anywhere and double-click `START.bat`.
 
@@ -118,7 +128,6 @@ To host it online instead, upload the folder to any static host (for example Git
 ## Future Enhancements
 
 - Better `.pptx` import (gradient fills, tables as real tables, rotation values).
-- Keep video and media lists after a reload.
 - More Bible translations and hymn collections.
 - A server-independent launcher for macOS and Linux.
 - More slide designs and transitions.
@@ -127,6 +136,8 @@ To host it online instead, upload the folder to any static host (for example Git
 
 The full, dated history of every change is in [`UPDATE_LOG.txt`](UPDATE_LOG.txt) (newest at the bottom). Recent highlights:
 
+- **2026-11-27** – More fonts, in A–Z menus with samples; fonts saved in the project (works offline); backup and restore; keyboard / clicker control; video controls on every page; video no longer pauses when changing pages.
+- **2026-11-26** – The screen stays put when switching pages; Bible and Hymnals previews match the projector.
 - **2026-11-25** – `.pptx` export and import; Import / Export of `.sbvc.json`; preview screen in Preaching / PowerPoint; Live chat and security hardening; Live mode; PowerPoint tab; Presenter View.
 - **2026-11-24** – First static version: Bible controller, Presentation window, Hymnals, Preaching editor with designs, shapes and pictures.
 
@@ -135,7 +146,7 @@ The full, dated history of every change is in [`UPDATE_LOG.txt`](UPDATE_LOG.txt)
 - Windows 10 or later (for `START.bat`), or any OS with a static web server
 - Chrome, Edge or Firefox (recent versions)
 - Two displays (or a projector) recommended for the Presentation window
-- Internet access is needed **only** for Live mode (to reach the free PeerJS broker that introduces two computers; slides and chat go directly between them)
+- No internet is needed (fonts and libraries are included), **except** for Live mode (to reach the free PeerJS broker that introduces two computers; slides and chat go directly between them)
 
 ## Troubleshooting
 
@@ -143,10 +154,12 @@ The full, dated history of every change is in [`UPDATE_LOG.txt`](UPDATE_LOG.txt)
 | --- | --- |
 | `START.bat` closes or the page does not open | Check that port 8765 is free, or run `tools\serve.ps1 -Port 9000` and open that port. |
 | Presentation window does not update | Open the Controller and Presentation from the **same address** (both `localhost`, not one `127.0.0.1`). |
-| Videos disappear after refresh | Video files cannot be stored by the browser; add them again. |
+| Video sound breaks when changing pages | Open the Presentation window (the ▶ button). If it shows *Click here once...*, click that window once. The Now Playing box should say **Sound: Presentation window**. |
+| No video sound | Check the volume and speaker button in the Now Playing box. If there is a **Click to turn the sound back on** button, click it. |
+| Clicker or arrow keys do nothing | Put a verse, hymn line or slide on the screen first, and keep that page open in the controller window. |
 | Live mode cannot connect | Check both computers are online, the key is typed exactly, and the host has the Live panel open. Some strict networks block WebRTC. |
 | A `.pptx` looks different after import | Import is best effort; fonts, animations, charts and gradient shapes may change. |
-| Everything looks reset | Browser data was cleared; slides and settings are stored in `localStorage`. Use Export to keep a backup. |
+| Everything looks reset | Browser data was cleared; slides and settings are stored in `localStorage`. Use the **Backup** button regularly and restore from that file. |
 
 ## Acknowledgment
 

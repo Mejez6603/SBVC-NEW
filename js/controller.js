@@ -83,10 +83,54 @@
   }
   function selectVerse(verse, version, text) {
     sel.verse = verse; sel.version = version; sel.focus = null;
-    setPassage({ reference: sel.book + ' ' + sel.chapter + ':' + verse, text: text });
+    setPassage({ reference: sel.book + ' ' + sel.chapter + ':' + verse, text: text, version: version });
     markSelectedVerses();
     scrollTwinIntoView(); saveUi(); // bring the same verse of the OTHER translation into view
   }
+
+  // Arrow keys / Page Up and Down / a clicker: the next or previous verse of the one on the screen
+  var stepping = false;
+  function stepVerse(d) {
+    if (S.getRaw(K.contentType) !== 'bible') return false;
+    var p = S.getJSON(K.passage, null);
+    var m = p && /^(.+) (\d+):(\d+)$/.exec(p.reference || '');
+    if (!m || BK.allBooks.indexOf(m[1]) < 0) return false;
+    if (stepping) return true;
+    stepping = true;
+    var version = ['KJV', 'ADB', 'TCB'].indexOf(p.version) >= 0 ? p.version : (sel.version || sel.english);
+    function numbers(chapterData) { return Object.keys(chapterData).map(Number).sort(function (a, b) { return a - b; }); }
+    function go(book, chapter, verse, data) {
+      var moved = sel.book !== book || sel.chapter !== chapter;
+      sel.book = book; sel.chapter = chapter; sel.verse = verse; sel.version = version; sel.focus = null;
+      if (version === 'KJV') sel.english = version;
+      else if (sel.tagalog !== version) { sel.tagalog = version; moved = true; }
+      S.setRaw(K.book, book); S.setRaw(K.chapter, String(chapter));
+      setPassage({ reference: book + ' ' + chapter + ':' + verse, text: data[String(chapter)][verse], version: version });
+      if (moved) { renderBooks(); renderChapters(); renderVersionButtons(); renderVerses(); }
+      else {
+        markSelectedVerses();
+        var on = document.querySelector('.verse.sel');
+        if (on) scrollWithin(on, 'center');
+        scrollTwinIntoView();
+      }
+      saveUi();
+    }
+    S.loadBook(version, m[1]).then(function (data) {
+      var book = m[1], chapter = Number(m[2]), list = numbers(data[String(chapter)] || {});
+      var i = list.indexOf(Number(m[3])) + d;
+      if (i >= 0 && i < list.length) { go(book, chapter, list[i], data); return; }
+      var next = chapter + d;
+      if (data[String(next)]) { var l = numbers(data[String(next)]); go(book, next, d > 0 ? l[0] : l[l.length - 1], data); return; }
+      var other = BK.allBooks[BK.allBooks.indexOf(book) + d];
+      if (!other) return; // the start or the end of the Bible
+      return S.loadBook(version, other).then(function (od) {
+        var chapters = numbers(od), c = d > 0 ? chapters[0] : chapters[chapters.length - 1], vs = numbers(od[String(c)]);
+        go(other, c, d > 0 ? vs[0] : vs[vs.length - 1], od);
+      });
+    }).catch(function (e) { console.error(e); }).then(function () { stepping = false; });
+    return true;
+  }
+  S.onStepKey(stepVerse);
 
   // The same verse number in the other column (the one that was NOT clicked)
   function scrollTwinIntoView() {

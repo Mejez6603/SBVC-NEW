@@ -3,6 +3,7 @@
   'use strict';
 
   var KEYS = {
+    remoteStep: 'sbvc-remote-step', // a next / previous key pressed on the projector window
     theme: 'sbvc-theme',
     passage: 'sbvc-passage',
     bg: 'sbvc-background-color',
@@ -108,6 +109,141 @@
     return font.indexOf(' ') >= 0 ? "'" + font + "'" : font;
   }
 
+  // every font menu uses this one list, A to Z; the files are in fonts/ (see fonts/README.txt)
+  var FONT_NAMES = ['Anton', 'Arvo', 'Barlow', 'Bebas Neue', 'Bitter', 'Caveat', 'Cinzel', 'Comfortaa', 'Cormorant Garamond',
+    'Dancing Script', 'EB Garamond', 'Fredoka', 'Futura', 'Georgia', 'Great Vibes', 'Inter', 'JetBrains Mono', 'Jost', 'Lato',
+    'Libre Baskerville', 'Literata', 'Merriweather', 'monospace', 'Montserrat', 'Noto Sans', 'Nunito', 'Open Sans', 'Oswald',
+    'Pacifico', 'Playfair Display', 'Poppins', 'Quicksand', 'Raleway', 'Roboto', 'Roboto Mono', 'Roboto Slab',
+    'Source Code Pro', 'Source Sans 3', 'Space Mono', 'Times New Roman', 'Ubuntu', 'Work Sans', 'Zilla Slab'];
+  FONT_NAMES.sort(function (a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+  var FONT_SAMPLE = 'Grace & Peace';
+  function fontLabel(name) { return name === 'monospace' ? 'Monospace' : name; }
+
+  /* A font menu that shows each name with a sample written in that font (a normal <select> cannot do that).
+   * Use it like a <select>: picker.value and picker.onchange. */
+  var openFontList = null; // only one list is open at a time
+  function createFontPicker(extraClass) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'fontpick' + (extraClass ? ' ' + extraClass : '');
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+    var nameEl = document.createElement('span'); nameEl.className = 'fp-name';
+    var sampleEl = document.createElement('span'); sampleEl.className = 'fp-sample';
+    btn.appendChild(nameEl); btn.appendChild(sampleEl);
+
+    var value = '', list = null, items = [], active = -1, watch = null;
+
+    function show() {
+      nameEl.textContent = fontLabel(value);
+      sampleEl.textContent = extraClass === 'fb-font' ? 'Aa' : FONT_SAMPLE; // the bar above a box is narrow
+      sampleEl.style.fontFamily = value ? fontFamily(value) : '';
+      btn.title = 'Font: ' + fontLabel(value);
+    }
+    Object.defineProperty(btn, 'value', {
+      configurable: true,
+      get: function () { return value; },
+      set: function (v) { value = String(v || ''); show(); }
+    });
+
+    function mark(i, scroll) {
+      if (items[active]) items[active].classList.remove('active');
+      active = Math.max(0, Math.min(items.length - 1, i));
+      items[active].classList.add('active');
+      if (scroll) items[active].scrollIntoView({ block: 'nearest' });
+    }
+    function close() {
+      if (!list) return;
+      clearInterval(watch);
+      document.removeEventListener('mousedown', outside, true);
+      document.removeEventListener('scroll', scrolled, true);
+      window.removeEventListener('resize', close);
+      list.remove(); list = null; items = []; active = -1;
+      if (openFontList === close) openFontList = null;
+      btn.setAttribute('aria-expanded', 'false');
+    }
+    function outside(e) { if (list && !list.contains(e.target) && !btn.contains(e.target)) close(); }
+    function scrolled(e) { if (list && e.target !== list) close(); } // the button moved away from under the list
+    function choose(name) {
+      var changed = name !== value;
+      close();
+      if (!btn.isConnected) return;
+      btn.value = name;
+      if (changed && btn.onchange) btn.onchange();
+    }
+    function open() {
+      if (openFontList) openFontList();
+      list = document.createElement('div');
+      list.className = 'fontlist';
+      list.setAttribute('role', 'listbox');
+      items = FONT_NAMES.map(function (name, i) {
+        var row = document.createElement('div');
+        row.className = 'fp-item' + (name === value ? ' on' : '');
+        row.setAttribute('role', 'option');
+        row.setAttribute('aria-selected', String(name === value));
+        var n = document.createElement('span'); n.className = 'fp-name'; n.textContent = fontLabel(name);
+        var s = document.createElement('span'); s.className = 'fp-sample'; s.textContent = FONT_SAMPLE;
+        s.style.fontFamily = fontFamily(name);
+        row.appendChild(n); row.appendChild(s);
+        row.onmousemove = function () { if (active !== i) mark(i, false); };
+        row.onclick = function () { choose(name); };
+        list.appendChild(row);
+        return row;
+      });
+      // keeps the cursor and the selected words in the slide's text box while you pick
+      list.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      document.body.appendChild(list);
+
+      var r = btn.getBoundingClientRect();
+      var width = Math.min(Math.max(r.width, 320), window.innerWidth - 16);
+      var below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+      var up = below < 260 && above > below;
+      var height = Math.max(140, Math.min(360, up ? above : below));
+      list.style.width = width + 'px';
+      list.style.maxHeight = height + 'px';
+      list.style.left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8)) + 'px';
+      list.style.top = (up ? Math.max(8, r.top - 4 - Math.min(height, list.offsetHeight)) : r.bottom + 4) + 'px';
+
+      var at = Math.max(0, FONT_NAMES.indexOf(value));
+      mark(at, false);
+      list.scrollTop = Math.max(0, items[at].offsetTop - list.clientHeight / 2);
+      document.addEventListener('mousedown', outside, true);
+      document.addEventListener('scroll', scrolled, true);
+      window.addEventListener('resize', close);
+      watch = setInterval(function () { if (!btn.isConnected || !btn.offsetParent) close(); }, 250);
+      openFontList = close;
+      btn.setAttribute('aria-expanded', 'true');
+    }
+
+    // while typing in a slide box, the cursor stays there (otherwise the panel redraws before the menu can open)
+    btn.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+      if (!(document.activeElement && document.activeElement.isContentEditable)) btn.focus();
+    });
+    btn.onclick = function () { if (list) close(); else open(); };
+    btn.onkeydown = function (e) {
+      if (e.key === 'Tab') { close(); return; }
+      e.stopPropagation(); // arrows here must not move the verse or slide on the projector
+      var down = e.key === 'ArrowDown', upKey = e.key === 'ArrowUp';
+      if (!list) {
+        if (down || upKey) { e.preventDefault(); open(); }
+        return;
+      }
+      if (down || upKey) { e.preventDefault(); mark(active + (down ? 1 : -1), true); }
+      else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); mark(e.key === 'Home' ? 0 : items.length - 1, true); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(FONT_NAMES[active]); }
+      else if (e.key === 'Escape') { e.preventDefault(); close(); }
+      else if (e.key.length === 1) { // type a letter to jump to it
+        var letter = e.key.toLowerCase();
+        for (var step = 1; step <= items.length; step++) {
+          var j = (active + step) % items.length;
+          if (fontLabel(FONT_NAMES[j]).charAt(0).toLowerCase() === letter) { mark(j, true); break; }
+        }
+      }
+    };
+    return btn;
+  }
+
   // ---- background: a color, optionally with a custom picture on top (Hymnals only) ----
   function getBgImageUrl() {
     var id = getRaw(KEYS.bgImage);
@@ -127,17 +263,50 @@
   }
 
   // ---- video follower: makes a (muted) <video> copy the controller's playback state ----
-  function syncVideo(video) {
+  function syncVideo(video, tolerance) {
     var st = getJSON(KEYS.playback, null);
     if (!video || !st) return;
     // when playing, the saved time is slightly old: add the time that passed since it was saved
     var target = st.isPlaying ? st.currentTime + Math.max(0, (Date.now() - st.timestamp) / 1000) : st.currentTime;
-    if (isFinite(target) && Math.abs(video.currentTime - target) > 1.5) {
+    if (isFinite(target) && Math.abs(video.currentTime - target) > (tolerance || 1.5)) {
       try { video.currentTime = target; } catch (e) {}
     }
-    if (st.isPlaying && video.paused) video.play().catch(function () {});
+    var over = isFinite(video.duration) && target >= video.duration; // play() on a finished video would restart it
+    if (st.isPlaying && !over && video.paused) video.play().catch(function () {});
     else if (!st.isPlaying && !video.paused) video.pause();
   }
+
+  // ---- video sound: whoever makes the sound (Presentation window or a controller tab) is also the clock ----
+  // it reports where the video really is, but only when that differs from what the others expect
+  function reportClock(video, limit) {
+    var st = getJSON(KEYS.playback, null);
+    if (!st || !st.isPlaying || video.paused || video.seeking || video.readyState < 3) return;
+    var expected = st.currentTime + Math.max(0, (Date.now() - st.timestamp) / 1000);
+    if (Math.abs(video.currentTime - expected) > limit) setJSON(KEYS.playback, { isPlaying: true, currentTime: video.currentTime, timestamp: Date.now() });
+  }
+  function reportEnded(video) {
+    var st = getJSON(KEYS.playback, null);
+    if (st && st.isPlaying) setJSON(KEYS.playback, { isPlaying: false, currentTime: video.duration || video.currentTime, timestamp: Date.now() });
+  }
+  // volume and mute, remembered on this computer only
+  var soundPrefs = {
+    get: function () {
+      var v = 1, m = false;
+      try {
+        var n = parseFloat(localStorage.getItem('sbvc-player-volume'));
+        if (n >= 0 && n <= 1) v = n;
+        m = localStorage.getItem('sbvc-player-muted') === '1';
+      } catch (e) { /* none */ }
+      return { volume: v, muted: m };
+    },
+    set: function (volume, muted) {
+      try {
+        localStorage.setItem('sbvc-player-volume', String(volume));
+        localStorage.setItem('sbvc-player-muted', muted ? '1' : '0');
+      } catch (e) { /* none */ }
+    },
+    owns: function (key) { return key === 'sbvc-player-volume' || key === 'sbvc-player-muted'; }
+  };
 
   // ---- media hand-over: the controller saves the video FILE in IndexedDB and the projector window reads it.
   // (A blob: link made by one window does not work in another window when the pages are opened from disk.)
@@ -251,8 +420,33 @@
     return s;
   }
 
+  // ---- next / previous with the keyboard or a presentation clicker ----
+  function stepOfKey(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return 0;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') return 1;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') return -1;
+    return 0;
+  }
+  // fn(+1 or -1) moves what is on the screen; it returns true if it did something with the key
+  function onStepKey(fn) {
+    document.addEventListener('keydown', function (e) {
+      var d = stepOfKey(e);
+      if (!d || e.defaultPrevented) return;
+      var t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|VIDEO|AUDIO)$/.test(t.tagName))) return;
+      if (document.querySelector('.impdlg')) return; // a question is open
+      if (fn(d)) e.preventDefault();
+    });
+    listeners.push(function (key) {
+      if (key !== KEYS.remoteStep) return;
+      var m = getJSON(KEYS.remoteStep, null);
+      if (m && (m.d === 1 || m.d === -1) && Date.now() - m.t < 3000) fn(m.d);
+    });
+  }
+
   window.SBVC = {
     passageStage: passageStage, fitStage: fitStage,
+    stepOfKey: stepOfKey, onStepKey: onStepKey,
     KEYS: KEYS,
     DEFAULT_CUSTOM: DEFAULT_CUSTOM,
     getRaw: getRaw, setRaw: setRaw, getJSON: getJSON, setJSON: setJSON,
@@ -261,7 +455,10 @@
     setLiveHook: function (fn) { liveHook = fn; },
     getCustom: getCustom, setCustom: setCustom, resetCustom: resetCustom,
     fontFamily: fontFamily,
+    createFontPicker: createFontPicker,
     syncVideo: syncVideo,
+    reportClock: reportClock, reportEnded: reportEnded, soundPrefs: soundPrefs,
+    PROJECTOR_OPEN: 'sbvc-projector-open', PROJECTOR_SOUND: 'sbvc-projector-sound',
     mediaStore: mediaStore,
     mediaLibrary: mediaLibrary,
     applyBackground: applyBackground,

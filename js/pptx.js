@@ -426,7 +426,6 @@
             tf = String(tf).replace(/[^A-Za-z0-9 ]/g, '').trim().slice(0, 40);
             return tf;
           }
-          var FONTS = ['Inter', 'Literata', 'Georgia', 'Times New Roman', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Oswald', 'Raleway', 'Merriweather', 'Playfair Display', 'Ubuntu', 'Noto Sans'];
           function textOf(txBody, ph) { // -> {text, html, style, lines, plain}
             var fs = fontScaleOf(kid(txBody, 'bodyPr')), paras = kids(txBody, 'p'), html = '', plain = [], first = null, lines = 0, algn = 'left', lnSpc = 1.2, ds = defSize(ph);
             var lst = kid(txBody, 'lstStyle'), l1 = lst && kid(lst, 'lvl1pPr'), ld = l1 && kid(l1, 'defRPr');
@@ -456,7 +455,7 @@
             });
             var txt = plain.join('\n');
             first = first || { px: Math.round(ds * fs * scale * 12700), col: defTextColor, face: '', bold: false, ital: false };
-            var fam = FONTS.indexOf(first.face) >= 0 ? first.face : (first.face || 'Inter');
+            var fam = first.face || 'Inter';
             return { text: txt.slice(0, 20000), html: html.length > 60000 ? '' : html, lines: lines, firstPx: first.px,
               style: { fontFamily: fam, fontSize: first.px, color: first.col, bold: first.bold, italic: first.ital, align: algn, lineHeight: Math.round(lnSpc * 100) / 100 }, plain: txt.trim() };
           }

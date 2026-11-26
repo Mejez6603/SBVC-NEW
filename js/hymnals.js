@@ -151,7 +151,7 @@
       text: index === -1 ? '' : lines.join('\n')
     });
     takeScreen();
-    renderLyrics(); renderNowPlaying(); renderMedia(); saveUi();
+    renderLyrics(); renderMedia(); saveUi();
   }
 
   function renderLyrics() {
@@ -179,6 +179,19 @@
     });
     host.appendChild(list);
   }
+
+  // Arrow keys / Page Up and Down / a clicker: the next or previous part of the hymn on the screen
+  S.onStepKey(function (d) {
+    if (!hymnOnScreen() || !state.hymn || state.verseIndex === null || !S.getJSON(K.passage, null)) return false;
+    var groups = groupLyrics(state.hymn.lyrics);
+    var i = state.verseIndex + d; // -1 is the title
+    if (i >= -1 && i < groups.length) {
+      project(i, i === -1 ? [state.hymn.title] : groups[i]);
+      var on = document.querySelector('.lyric.on');
+      if (on) on.scrollIntoView({ block: 'nearest' });
+    }
+    return true;
+  });
 
   /* ------------------------------------------------------------------ *
    * Center (Video tab): upload, library, now playing
@@ -257,7 +270,7 @@
       S.setJSON(K.activeMedia, meta);
       takeScreen();
       setPassage(null);
-      renderMedia(); renderNowPlaying();
+      renderMedia();
     }
     // First leave the file where the presentation window can read it (see SBVC.mediaStore), then announce it.
     S.mediaStore.put(file.file).then(function () {
@@ -276,7 +289,7 @@
     if (am && am.url === file.url) { S.setJSON(K.activeMedia, null); S.mediaStore.clear(); S.setJSON(K.playback, null); }
     URL.revokeObjectURL(file.url);
     S.mediaLibrary.remove(file.id); // also forget it in browser storage
-    renderMedia(); renderNowPlaying();
+    renderMedia();
   }
 
   function renderMedia() {
@@ -307,33 +320,7 @@
     });
   }
 
-  function renderNowPlaying() {
-    var host = $('nowPlaying');
-    var am = activeMedia();
-    host.textContent = '';
-    if (!am || !state.library.some(function (f) { return f.url === am.url; })) return;
-    host.className = 'nowplaying';
-    host.appendChild(el('h3', '', 'Now Playing'));
-    var v = document.createElement('video');
-    v.controls = true; v.src = am.url;
-    v.className = 'nowvideo';
-    // this player is the "master": the projector copies what it does
-    function publish() {
-      S.setJSON(K.playback, { isPlaying: !v.paused, currentTime: v.currentTime, timestamp: Date.now() });
-    }
-    // First jump to where the video already is (you may be coming back to this page). It only starts leading
-    // once it really plays or you touch it, so a browser that blocks autoplay cannot pause the projector.
-    var leading = false;
-    function lead() {
-      if (leading) return;
-      leading = true;
-      ['play', 'pause', 'seeked', 'timeupdate'].forEach(function (t) { v.addEventListener(t, publish); });
-    }
-    v.addEventListener('playing', lead);
-    v.addEventListener('pointerdown', lead);
-    v.addEventListener('loadedmetadata', function () { S.syncVideo(v); });
-    host.appendChild(v);
-  }
+  // The Now Playing player (sound and controls) is shared by all controller pages: js/player.js
 
   /* ------------------------------------------------------------------ *
    * Right: preview, buttons, customization
@@ -349,7 +336,7 @@
     S.setJSON(K.activeMedia, null); S.mediaStore.clear();
     S.setJSON(K.playback, null);
     state.verseIndex = null;
-    renderLyrics(); renderMedia(); renderNowPlaying(); saveUi();
+    renderLyrics(); renderMedia(); saveUi();
   };
   $('bReset').onclick = function () {
     S.setCustom({ positions: { title: { x: 0, y: 0 }, text: { x: 0, y: 0 } } }, K.hymnCustom);
@@ -378,7 +365,7 @@
 
   S.onChange(function (key) {
     if (key === K.playback) return;
-    if (key === K.activeMedia || key === null) { renderMedia(); if (!activeMedia()) renderNowPlaying(); } // stopped from another page
+    if (key === K.activeMedia || key === null) renderMedia(); // stopped from the player or another page
     if (key === K.contentType && !hymnOnScreen() && state.verseIndex !== null) {
       state.verseIndex = null; renderLyrics(); saveUi(); // another page took the screen
     }
@@ -409,7 +396,7 @@
   renderPreset();
   renderLyrics();
   renderMedia();
-  renderNowPlaying();
+ 
   panel.sync();
   pv.render();
 
@@ -426,7 +413,7 @@
     var am = activeMedia();
     if (am) {
       var same = state.library.filter(function (f) { return f.name === am.name && f.type === am.type; })[0];
-      if (same) { am.url = same.url; S.setJSON(K.activeMedia, am); renderNowPlaying(); }
+      if (same) { am.url = same.url; S.setJSON(K.activeMedia, am); }
     }
     renderMedia();
   }).catch(function (e) { console.error('Could not read the saved media library', e); });

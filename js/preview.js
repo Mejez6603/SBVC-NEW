@@ -153,6 +153,8 @@
       setTimeout(function () { queued = false; render(); }, 0);
     });
 
+    setInterval(function () { if (video && video.readyState > 0) syncMedia(); }, 1000);
+
     if (window.ResizeObserver) new ResizeObserver(function () { render(); }).observe(container);
 
     return { render: render, syncMedia: syncMedia };

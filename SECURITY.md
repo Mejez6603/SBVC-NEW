@@ -25,6 +25,7 @@ Please give us reasonable time to fix the problem before telling anyone else.
 - **Local libraries only.** PeerJS, PptxGenJS and JSZip are stored in `js/vendor/` with SHA-256 checksums; nothing is loaded from a CDN, so a compromised CDN cannot run code in the site.
 - **Live mode safeguards.** Peer-to-peer (WebRTC) connections, host approval for every guest, view / control / edit roles, host controls (kick, block, change role), a restore point, an activity log, strict checking of every message received (allowed keys only, size limits, no scripts or outside web addresses, pictures limited to safe types) and rate limits.
 - **Safe imports.** Imported `.sbvc.json` and `.pptx` files are checked first: SBVC slides only, limits on slide / element counts and file size, no scripts or outside web links, and only png / jpg / webp / gif pictures. A zip-bomb guard protects `.pptx` import.
+- **Checked restores.** A backup file is checked before it is restored: only SBVC's own settings, no scripts or outside web links, only safe pictures and video / audio files. Live mode keys are never put in a backup. A backup is not encrypted, so keep it as private as your notes.
 - **Safe chat files.** Only a short list of document types up to 1 MB, and pictures shrunk before sending.
 
 ## Known Limits

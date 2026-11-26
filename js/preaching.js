@@ -23,8 +23,6 @@
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
-  var FONTS = ['Inter', 'Literata', 'Georgia', 'Times New Roman', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
-    'Oswald', 'Raleway', 'Merriweather', 'Playfair Display', 'Ubuntu', 'Noto Sans', 'monospace'];
   var COLORS = ['#D4A373', '#F5EBDD', '#FFFFFF', '#FACC15', '#60A5FA', '#808080', '#000000'];
   var BG_COLORS = ['#000000', '#FFFFFF', '#F2F2F2', '#F5F1EB', '#E8EEF5', '#2B2B2B', '#0B1D3A', '#3B0A0A'];
   var VERSIONS = [['kjv', 'KJV (English)'], ['adb', 'ADB (Tagalog)'], ['tcb', 'TCB (Tagalog)']];
@@ -540,8 +538,7 @@
     var st = barStyle();
     var isRef = it.type === 'verse' && curPart === 'ref';
 
-    var sel = el('select', 'fb-font');
-    FONTS.forEach(function (n) { var o = el('option', '', n); o.value = n; sel.appendChild(o); });
+    var sel = S.createFontPicker('fb-font');
     sel.value = st.fontFamily || 'Inter';
     // with part of the text selected, a change applies to that part only; otherwise to the whole box
     sel.onchange = function () {
@@ -922,10 +919,15 @@
     return f;
   }
   function fontSelect(label, get, set) {
-    var f = field(label), s = el('select');
-    FONTS.forEach(function (n) { var o = el('option', '', n); o.value = n; s.appendChild(o); });
+    var f = field(label), s = S.createFontPicker();
+    s.setAttribute('aria-label', label);
     s.value = get();
-    s.onchange = function () { set(s.value); };
+    s.onchange = function () { // finish any typing first, then show the new choice in the redrawn panel
+      var v = s.value, typing = !!endEdit;
+      if (typing) endEdit();
+      set(v);
+      if (typing) buildFormat();
+    };
     f.appendChild(s);
     return f;
   }
@@ -1452,6 +1454,18 @@
     liveId = deck.slides[j].id;
     pushLive();
   }
+  function clickerStep(d) { // the slide on the screen, with the editor following along
+    if (screenIndex() < 0) return false;
+    liveStep(d);
+    gotoSlide(screenIndex());
+    return true;
+  }
+  // arrow keys / Page Up and Down pressed on the projector window (keys pressed on this page are handled below)
+  S.onChange(function (key) {
+    if (key !== K.remoteStep) return;
+    var m = S.getJSON(K.remoteStep, null);
+    if (m && (m.d === 1 || m.d === -1) && Date.now() - m.t < 3000) clickerStep(m.d);
+  });
   $('tShow').onclick = function () { goLive(deck.current); };
   window.addEventListener('resize', function () { if ($('paneView').classList.contains('on')) pvNodes.forEach(function (n, i) { paintPv(i); }); });
   $('tUndo').onclick = undo;
@@ -1502,8 +1516,11 @@
       if (k !== 'Enter') document.execCommand('insertText', false, k);
       return;
     }
-    if (k === 'PageUp') { gotoSlide(deck.current - 1); e.preventDefault(); }
-    else if (k === 'PageDown') { gotoSlide(deck.current + 1); e.preventDefault(); }
+    if (k === 'PageUp' || k === 'PageDown') { // a clicker: moves the screen when this page's slide is on it
+      var dir = k === 'PageDown' ? 1 : -1;
+      if (!clickerStep(dir)) gotoSlide(deck.current + dir);
+      e.preventDefault();
+    }
     else if (k === 'Escape') { setSel(null); }
     else if ((k === 'Delete' || k === 'Backspace') && it) { deleteElement(); e.preventDefault(); }
     else if (k === 'Delete' || k === 'Backspace') { deleteSlide(); e.preventDefault(); }

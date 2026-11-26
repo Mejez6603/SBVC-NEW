@@ -40,7 +40,7 @@
   function isSlides() { var c = S.getRaw(K.contentType); return c === 'preaching' || c === 'powerpoint'; }
 
   function render() {
-    if (isSlides()) { renderPreaching(); return; }
+    if (isSlides()) { dropVideo(); renderPreaching(); return; }
     screenEl.style.position = '';
     var passage = S.getJSON(K.passage, null);
     var media = S.getRaw(K.contentType) === 'hymnal' ? S.getJSON(K.activeMedia, null) : null;
@@ -52,18 +52,20 @@
     // background color, or your own picture if one is chosen
     S.applyBackground(screenEl, true, true);
     screenEl.style.paddingLeft = screenEl.style.paddingRight = media ? c.horizontalPadding + 'rem' : '0';
+    dropVideo();
     screenEl.textContent = '';
-    video = null;
 
     if (media) {
       var v = document.createElement('video');
       video = v;
       v.dataset.id = String(media.id);
-      v.muted = true;        // the sound plays from the controller computer
+      v.muted = true;        // starts silent; startSound() turns the sound on
       v.playsInline = true;
       v.style.cssText = 'width:100%;height:100%;object-fit:cover';
       screenEl.appendChild(v);
-      v.addEventListener('loadedmetadata', syncMedia);
+      v.addEventListener('loadedmetadata', function () { syncMedia(); startSound(); });
+      v.addEventListener('playing', function () { if (video === v && hasSound) S.reportClock(v, 0.25); });
+      v.addEventListener('ended', function () { if (video === v && hasSound) S.reportEnded(v); });
       getMediaUrl(media).then(function (url) {
         if (video !== v) return;   // the screen changed again while the file was loading
         v.src = url;
@@ -86,7 +88,79 @@
     S.fitStage(made.stage, window.innerWidth, window.innerHeight);
   }
 
-  function syncMedia() { if (video) S.syncVideo(video); }
+  function syncMedia() { if (video) S.syncVideo(video, hasSound ? 0.4 : 1.5); } // with the sound, small jumps are obeyed too
+  function dropVideo() {
+    if (video) { video.pause(); video.removeAttribute('src'); }
+    video = null;
+    showHint(false);
+  }
+
+  /* ---------- sound ----------
+   * This window never changes pages, so when it plays the sound the video is not interrupted while the operator
+   * moves between the controller pages. Browsers may ask for one click in this window before they allow it. */
+  var allowed = false;  // the browser lets this window play sound
+  var hasSound = false; // and this is the (only) Presentation window doing it
+  var testing = false;
+  var hint = null;
+  if (navigator.locks) {
+    navigator.locks.request(S.PROJECTOR_OPEN, { mode: 'shared' }, function () { return new Promise(function () {}); });
+  }
+
+  function showHint(on) {
+    if (on && !hint) {
+      hint = document.createElement('div');
+      hint.className = 'soundhint';
+      hint.textContent = 'Click here once so the video sound plays without breaks';
+      document.body.appendChild(hint);
+    } else if (!on && hint) { hint.remove(); hint = null; }
+  }
+  function applySound() {
+    if (!video) return;
+    var p = S.soundPrefs.get();
+    video.volume = p.volume;
+    video.muted = !hasSound || p.muted;
+  }
+  function takeSound() { // only one Presentation window may make the sound
+    navigator.locks.request(S.PROJECTOR_SOUND, function () {
+      hasSound = true;
+      applySound();
+      return new Promise(function () {}); // kept until this window closes
+    });
+  }
+  function startSound() {
+    var v = video;
+    if (!v || !v.src || !navigator.locks) return; // old browser: the controller keeps the sound
+    if (allowed) { applySound(); return; }
+    if (testing) return;
+    testing = true;
+    // try (at volume 0) whether the browser lets us play with sound
+    v.volume = 0;
+    v.muted = false;
+    v.play().then(function () {
+      testing = false;
+      v.muted = true;
+      if (video !== v) { startSound(); return; }
+      allowed = true;
+      showHint(false);
+      takeSound();
+      applySound();
+      syncMedia(); // pauses again if the video is meant to be paused
+    }).catch(function (e) {
+      testing = false;
+      v.muted = true;
+      if (video !== v) { startSound(); return; }
+      if (e && e.name === 'NotAllowedError') showHint(true); // the controller page plays the sound meanwhile
+      syncMedia();
+    });
+  }
+  setInterval(function () {
+    if (!video || !video.readyState) return;
+    if (hasSound && !video.paused) S.reportClock(video, 0.75); else syncMedia();
+  }, 1000);
+  window.addEventListener('storage', function (e) { if (S.soundPrefs.owns(e.key)) applySound(); });
+  ['pointerdown', 'keydown'].forEach(function (type) {
+    document.addEventListener(type, function () { if (!allowed) startSound(); });
+  });
 
   // The controller leaves the video FILE in IndexedDB (media.idb). We make our own link to it,
   // and keep it while the same video stays selected.
@@ -149,6 +223,9 @@
   document.addEventListener('dblclick', goFullscreen);
   document.addEventListener('keydown', function (e) {
     if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey) goFullscreen();
+    // a clicker or arrow key pressed while this window is in front: pass it to the controller page
+    var d = S.stepOfKey(e);
+    if (d) { e.preventDefault(); S.setJSON(K.remoteStep, { d: d, t: Date.now(), n: Math.random() }); }
   });
 
   render();

@@ -50,7 +50,7 @@
   var SHARED = {};
   Object.keys(K).forEach(function (n) {
     var v = K[n];
-    if (typeof v === 'string' && v.indexOf('sbvc-') === 0 && v !== K.hymnUi && v !== K.ctrlUi && v !== K.fullscreen) SHARED[v] = true;
+    if (typeof v === 'string' && v.indexOf('sbvc-') === 0 && v !== K.hymnUi && v !== K.ctrlUi && v !== K.fullscreen && v !== K.remoteStep) SHARED[v] = true;
   });
   function syncable(k) { return SHARED[k] === true; }
   function allKeys() {

@@ -14,13 +14,6 @@
     return e;
   }
 
-  var FONTS = [
-    ['Inter', 'Inter (Sans-serif)'], ['Literata', 'Literata (Serif)'], ['monospace', 'Monospace'],
-    ['Georgia', 'Georgia'], ['Times New Roman', 'Times New Roman'], ['Roboto', 'Roboto'],
-    ['Open Sans', 'Open Sans'], ['Lato', 'Lato'], ['Montserrat', 'Montserrat'], ['Oswald', 'Oswald'],
-    ['Raleway', 'Raleway'], ['Merriweather', 'Merriweather'], ['Playfair Display', 'Playfair Display'],
-    ['Ubuntu', 'Ubuntu'], ['Noto Sans', 'Noto Sans']
-  ];
   var PRESET_COLORS = ['#D4A373', '#F5EBDD', '#FFFFFF', '#808080', '#000000'];
 
   // line sets for the four alignment icons
@@ -47,8 +40,8 @@
     function fontSelect(label, prop) {
       var f = el('div', 'field');
       f.appendChild(el('label', 'lbl', label));
-      var s = el('select');
-      FONTS.forEach(function (p) { var o = el('option', '', p[1]); o.value = p[0]; s.appendChild(o); });
+      var s = S.createFontPicker();
+      s.setAttribute('aria-label', label);
       s.onchange = function () { var u = {}; u[prop] = s.value; update(u); };
       f.appendChild(s);
       syncers.push(function (c) { s.value = c[prop]; });
