@@ -8,7 +8,7 @@
     "6": "Kaya magalak kayo kahit na sa ngayon ay kailangan ninyong magtiis ng iba't ibang pagsubok.",
     "7": "Ang mga pagsubok na ito'y para patunayan kung tunay ang inyong pananampalataya. Tulad ng ginto na dinadalisay sa apoy, ang inyong pananampalataya, na mas mahalaga kaysa ginto, ay kailangang patunayan kung tunay. At kung mapatunayan, pararangalan kayo at pupurihin sa araw ng pagbabalik ni Jesu-Cristo.",
     "8": "Hindi ninyo siya nakita, pero minamahal ninyo siya. At kahit hindi ninyo siya nakikita ngayon, sumasampalataya kayo sa kanya. Kaya napuspos kayo ng kagalakang hindi kayang ilarawan",
-    "9": "dahil natatanggap na ninyo ang bunga ng inyong pananampalataya, na walang iba kundi ang inyong kaligtasan.",
+    "9": "Dahil natatanggap na ninyo ang bunga ng inyong pananampalataya, na walang iba kundi ang inyong kaligtasan.",
     "10": "Ang kaligtasang ito'y masusing pinag-aralan at sinuri ng mga propeta noon. Nagpropesiya sila tungkol sa biyayang ito na inilaan sa inyo.",
     "11": "Pinagsikapan nilang alamin kung kailan at paano ito mangyayari. At ang Espiritu ni Cristo na nasa kanila ang nagturo sa kanila kung ano ang mga hirap na daranasin ni Cristo at ang karangalang tatanggapin niya.",
     "12": "Ipinahayag ng Dios sa kanila na ang kanilang mga sinasabi ay hindi para sa kanila kundi para sa inyo. At ngayon, narinig ninyo ang Magandang Balita mula sa mga taong nangaral sa inyo sa pamamagitan ng Banal na Espiritu na isinugo mula sa langit. Maging ang mga anghel ay nanabik na maunawaan ang Magandang Balitang ito."
@@ -33,7 +33,7 @@
     "3": "Ang inyong kagandahan ay hindi dapat nasa panlabas na anyo lamang, tulad ng magagandang ayos ng buhok, mga alahas na ginto, o mamahaling damit.",
     "4": "Sa halip, dapat itong nasa kaibuturan ng inyong puso, isang kagandahang hindi kumukupas na nagmumula sa isang maamo at mahinahong espiritu, na napakahalaga sa paningin ng Dios.",
     "5": "Sapagkat ganyan din ang paraan ng pagpapaganda ng mga banal na babae noong unang panahon na umasa sa Dios. Nagpasakop sila sa kanilang mga asawa,",
-    "6": "tulad ni Sara na sumunod kay Abraham at tinawag siyang panginoon. Kayo ay mga anak niya kung gumagawa kayo ng mabuti at hindi natatakot sa anumang banta.",
+    "6": "Tulad ni Sara na sumunod kay Abraham at tinawag siyang panginoon. Kayo ay mga anak niya kung gumagawa kayo ng mabuti at hindi natatakot sa anumang banta.",
     "7": "Gayundin naman, kayong mga asawang lalaki, mamuhay kayo kasama ng inyong mga asawa nang may pag-unawa, na pinahahalagahan sila bilang mas mahinang kasarian, ngunit kapwa tagapagmana ng biyaya ng buhay, upang walang maging hadlang sa inyong mga panalangin.",
     "8": "Sa wakas, magkaisa kayong lahat sa isipan, maging mahabagin, mag-ibigan bilang magkakapatid, maging maawain at mapagpakumbaba.",
     "9": "Huwag ninyong gantihan ng masama ang masama, o ng panlalait ang panlalait. Sa halip, pagpalain ninyo, sapagkat para dito kayo tinawag upang magmana kayo ng pagpapala.",
@@ -43,7 +43,7 @@
   },
   "4": {
     "1": "Kaya, dahil si Cristo ay nagdusa sa laman, maging handa rin kayo sa ganoong pag-iisip. Sapagkat ang nagdusa sa laman ay tapos na sa kasalanan,",
-    "2": "upang hindi na mamuhay ayon sa masasamang pagnanasa ng tao, kundi ayon sa kalooban ng Dios sa natitirang panahon niya sa laman.",
+    "2": "Upang hindi na mamuhay ayon sa masasamang pagnanasa ng tao, kundi ayon sa kalooban ng Dios sa natitirang panahon niya sa laman.",
     "3": "Sapat na ang panahong ginugol ninyo sa paggawa ng mga bagay na gusto ng mga hindi mananampalataya—pamumuhay sa kahalayan, masasamang pagnanasa, paglalasing, walang habas na pagsasaya, pag-iinuman, at kasuklam-suklam na pagsamba sa mga diyus-diyosan.",
     "4": "Nagtataka sila ngayon na hindi na kayo sumasama sa kanila sa ganoong uri ng walang-saysay na pamumuhay, kaya't sinisiraan nila kayo.",
     "5": "Ngunit mananagot sila sa kanya na handang humatol sa mga buháy at mga patay.",
@@ -58,7 +58,7 @@
   "5": {
     "1": "Kaya, nakikiusap ako sa mga nakatatanda sa inyo. Ako na kapwa ninyo nakatatanda, saksi sa mga pagdurusa ni Cristo, at kabahagi sa kaluwalhatiang ihahayag:",
     "2": "Alagaan ninyo ang kawan ng Dios na nasa inyong pangangalaga, hindi dahil sa sapilitan, kundi dahil gusto ninyo, ayon sa kalooban ng Dios; hindi dahil sa hangad na kumita, kundi dahil sa pananabik na maglingkod;",
-    "3": "hindi bilang mga panginoon sa mga ipinagkatiwala sa inyo, kundi bilang mga halimbawa sa kawan.",
+    "3": "Hindi bilang mga panginoon sa mga ipinagkatiwala sa inyo, kundi bilang mga halimbawa sa kawan.",
     "4": "At kapag dumating ang Punong Pastol, tatanggapin ninyo ang korona ng kaluwalhatian na hindi kumukupas.",
     "5": "Gayundin naman, kayong mga kabataan, magpasakop kayo sa mga nakatatanda. At kayong lahat, magbihis kayo ng kapakumbabaan sa pakikitungo sa isa't isa, sapagkat, “Sinasalungat ng Dios ang mga palalo, ngunit nagbibigay siya ng biyaya sa mga mapagpakumbaba.”",
     "6": "Kaya't magpakumbaba kayo sa ilalim ng makapangyarihang kamay ng Dios, upang sa takdang panahon ay itaas niya kayo.",

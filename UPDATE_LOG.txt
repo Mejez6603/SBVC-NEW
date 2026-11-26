@@ -184,6 +184,8 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-26 12:49PM Update KJV Hebrews.js, hosea.js, Isaiah.js, james.js, Jeremiah.js, job.js, joel.js, john.js, Jonah.js, Joshua.js, jude.js, judges.js (Ronigan)
 
+2026-11-26 17:00 Updated first words with capital letters, and missing verse on TCB2015 1Samuel 19 verse 3
+
 
 
 HOW TO ADD A NEW ENTRY
