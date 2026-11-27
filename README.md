@@ -12,6 +12,7 @@ SBVC is the static (plain web files) version of an earlier Next.js project.
 
 ## Features
 
+- **Splash screen** – the Mejez Studio logo animation plays when the home page opens, then the **Open Control Panel** screen appears. Click or press a key to skip it.
 - **Bible controller** – book / chapter / verse lists, search, three translations (KJV, ADB, TCB); picking a verse scrolls the same verse into view in the other translation.
 - **Hymnals** – search 308 English and 79 Tagalog hymns, build a queue of up to 15 and project them with their own styling.
 - **Preaching** – a PowerPoint-style editor: draggable slide thumbnails, text / verse / shape / picture boxes, rich text, 30 design templates and color schemes, undo/redo, copy/paste, multi-select.
@@ -105,8 +106,10 @@ SBVC-NEW/
 │   ├── present.js      Presentation window
 │   ├── live.js         Live mode, chat and security
 │   ├── pptx.js         .pptx export and import
+│   ├── splash.js       Splash screen on the home page
 │   └── vendor/         PeerJS, PptxGenJS, JSZip (+ README with checksums)
 ├── fonts/              The fonts, saved locally (+ README)
+├── assets/             splash.gif (the splash screen animation)
 ├── data/
 │   ├── bible/          kjv, adb, tcb (one file per book)
 │   ├── hymns/          English and Tagalog hymns
@@ -136,7 +139,7 @@ To host it online instead, upload the folder to any static host (for example Git
 
 The full, dated history of every change is in [`UPDATE_LOG.txt`](UPDATE_LOG.txt) (newest at the bottom). Recent highlights:
 
-- **2026-11-27** – More fonts, in A–Z menus with samples; fonts saved in the project (works offline); backup and restore; keyboard / clicker control; video controls on every page; video no longer pauses when changing pages.
+- **2026-11-27** – More fonts, in A–Z menus with samples; fonts saved in the project (works offline); backup and restore; keyboard / clicker control; video controls on every page; video no longer pauses when changing pages; splash screen.
 - **2026-11-26** – The screen stays put when switching pages; Bible and Hymnals previews match the projector.
 - **2026-11-25** – `.pptx` export and import; Import / Export of `.sbvc.json`; preview screen in Preaching / PowerPoint; Live chat and security hardening; Live mode; PowerPoint tab; Presenter View.
 - **2026-11-24** – First static version: Bible controller, Presentation window, Hymnals, Preaching editor with designs, shapes and pictures.

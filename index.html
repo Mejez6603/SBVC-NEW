@@ -7,10 +7,16 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="home">
+  <!-- splash screen: plays once, then shows the home screen (click or press a key to skip) -->
+  <div class="splash" id="splash">
+    <img id="splashArt" src="assets/splash.gif" alt="Mejez Studio">
+    <span>Click to skip</span>
+  </div>
+  <div class="home" id="home">
     <h1>SBVC</h1>
     <p>Your Bible Presentation Assistant</p>
     <button class="btn lg" onclick="window.open('controller.html','_blank')">Open Control Panel</button>
   </div>
+  <script src="js/splash.js"></script>
 </body>
 </html>

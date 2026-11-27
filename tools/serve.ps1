@@ -5,7 +5,7 @@ param([int]$Port = 8765)
 $root = Split-Path -Parent $PSScriptRoot
 $mime = @{
   '.html' = 'text/html; charset=utf-8'; '.js' = 'text/javascript; charset=utf-8'; '.css' = 'text/css; charset=utf-8'
-  '.json' = 'application/json'; '.svg' = 'image/svg+xml'; '.png' = 'image/png'; '.jpg' = 'image/jpeg'; '.ico' = 'image/x-icon'; '.woff2' = 'font/woff2'
+  '.json' = 'application/json'; '.svg' = 'image/svg+xml'; '.png' = 'image/png'; '.gif' = 'image/gif'; '.jpg' = 'image/jpeg'; '.ico' = 'image/x-icon'; '.woff2' = 'font/woff2'
 }
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$Port/")

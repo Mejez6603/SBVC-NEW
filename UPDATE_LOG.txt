@@ -1,4 +1,4 @@
-﻿SBVC STATIC - UPDATE LOG
+SBVC STATIC - UPDATE LOG
 ========================
 Every change to this folder is recorded here, newest at the BOTTOM.
 Format:  DATE | TIME | TYPE | DESCRIPTION
@@ -209,6 +209,8 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-27 16:14 Update TCB colossians.js, daniel.js, deuteromy.js, ecclesiastes.js, ephesians.js, esther.js, exodus.js, Ezekiel.js, ezra.js, galatians.js (Clod)
 2026-11-27 19:51 Update TCB genesis.js, Habakkuk.js, hanggai.js, hebrews.js, hosea.js, Isaiah.js, jeremiah.js, job.js, joel.js, joel.js, john.js, Jonah.js, Joshua.js, jude.js, judges.js, lamentations.js, Leviticus.js, luke.js, malachi.js (Clod)
+
+2026-11-27  20:06  ADD  Splash screen on the home page: the Mejez Studio logo animation plays once (about 6 seconds, click or press a key to skip), then the Open Control Panel screen shows (assets/splash.gif, js/splash.js, index.html, css/style.css; tools/serve.ps1 now knows the .gif type)
 
 HOW TO ADD A NEW ENTRY
 ----------------------
