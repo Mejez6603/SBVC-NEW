@@ -22,6 +22,7 @@ Please give us reasonable time to fix the problem before telling anyone else.
 ## What SBVC Already Does
 
 - **No server, no accounts.** Slides, notes and settings stay in your browser's `localStorage` on your own computer.
+- **Security headers on the online site.** `vercel.json` sends a Content-Security-Policy (only the site's own script files may run; the only outside connection allowed by it is the Live mode broker), plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy and Permissions-Policy (camera, microphone, location, payment and USB are off). The local `START.bat` server does not send them.
 - **Local libraries only.** PeerJS, PptxGenJS and JSZip are stored in `js/vendor/` with SHA-256 checksums; nothing is loaded from a CDN, so a compromised CDN cannot run code in the site.
 - **Live mode safeguards.** Peer-to-peer (WebRTC) connections, host approval for every guest, view / control / edit roles, host controls (kick, block, change role), a restore point, an activity log, strict checking of every message received (allowed keys only, size limits, no scripts or outside web addresses, pictures limited to safe types) and rate limits.
 - **Safe imports.** Imported `.sbvc.json` and `.pptx` files are checked first: SBVC slides only, limits on slide / element counts and file size, no scripts or outside web links, and only png / jpg / webp / gif pictures. A zip-bomb guard protects `.pptx` import.

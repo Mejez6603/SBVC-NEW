@@ -92,6 +92,9 @@ SBVC-NEW/
 ├── present.html        Presentation window for the projector
 ├── about.html          About / how it works
 ├── START.bat           Starts the local server on port 8765
+├── vercel.json         Security headers for the online (Vercel) site
+├── sitemap.xml         List of pages for search engines (update it if pages or the address change)
+├── robots.txt          Tells search engines where the sitemap is
 ├── UPDATE_LOG.txt      Every change, newest at the bottom
 ├── css/
 │   └── style.css
@@ -107,7 +110,7 @@ SBVC-NEW/
 │   ├── present.js      Presentation window
 │   ├── live.js         Live mode, chat and security
 │   ├── pptx.js         .pptx export and import
-│   ├── splash.js       Splash screen on the home page
+│   ├── splash.js       Home page: splash screen and Open Control Panel
 │   └── vendor/         PeerJS, PptxGenJS, JSZip (+ README with checksums)
 ├── fonts/              The fonts, saved locally (+ README)
 ├── assets/             Splash screen, browser tab icon and link preview picture
@@ -118,6 +121,8 @@ SBVC-NEW/
 └── tools/
     └── serve.ps1       Small local web server
 ```
+
+**When changing the code:** put JavaScript in `js/` files, not inside the `.html` pages (no `<script>` blocks with code and no `onclick=` attributes). The online site's security policy in `vercel.json` blocks it, even though it would still work with `START.bat`. The same applies to loading anything from a new outside address: add it to the policy first.
 
 ## Packaging for Distribution
 

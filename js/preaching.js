@@ -8,7 +8,7 @@
   var BK = window.SBVC_BOOKS;
   var W = S.STAGE_W, H = S.STAGE_H;
   // The Preaching page and the PowerPoint page run this same editor, each with its own slides.
-  var DK = window.SBVC_DECK === 'powerpoint'
+  var DK = document.body.getAttribute('data-deck') === 'powerpoint'
     ? { deck: K.pptDeck, live: K.pptLive, other: K.preachDeck, type: 'powerpoint', clip: 'sbvc-powerpoint-clip', ns: 'ppt', title: 'Presentation Title' }
     : { deck: K.preachDeck, live: K.preachLive, other: K.pptDeck, type: 'preaching', clip: 'sbvc-preaching-clip', ns: 'preach', title: 'Sermon Title' };
 

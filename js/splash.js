@@ -1,4 +1,5 @@
-/* The splash screen on the home page (index.html). */
+/* The home page (index.html): the splash screen and the Open Control Panel button.
+ * (Code is not written inside the pages: the security policy in vercel.json would block it.) */
 (function () {
   'use strict';
   var splash = document.getElementById('splash');
@@ -29,6 +30,8 @@
     clearTimeout(timer);
     timer = setTimeout(finish, SHOW_MS);
   }
+
+  document.getElementById('openPanel').addEventListener('click', function () { window.open('controller.html', '_blank'); });
 
   home.inert = true; // the button behind the splash cannot be reached yet
   splash.addEventListener('click', finish);
