@@ -1,4 +1,4 @@
-SBVC STATIC - UPDATE LOG
+﻿SBVC STATIC - UPDATE LOG
 ========================
 Every change to this folder is recorded here, newest at the BOTTOM.
 Format:  DATE | TIME | TYPE | DESCRIPTION
@@ -204,6 +204,8 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 2026-11-27  07:19  CHANGE  Font menus are one A-Z list (no more group headings, which were unreadable) and show each name with a sample in that font (own font picker in js/state.js, works with mouse and keyboard). Also fixed: choosing a font from the right panel while still typing in a slide box now applies it.
 
 2026-11-27  07:45  FIX  Video no longer pauses when changing pages: the Presentation window (which never reloads) now plays the sound and the Now Playing box is its remote control with its own play / pause, position, mute and volume buttons. If the browser wants a click first, the Presentation window says so. Without a Presentation window the controller page plays the sound as before (js/player.js, js/present.js, js/state.js, js/preview.js, css/style.css)
+
+2026-11-27 2:00PM Update KJV lamentations.js, Leviticus.js, luke.js, malachi.js, mark.js, matthew.js, micah.js, Nahum.js, Nehemiah.js, Obadiah.js, philemon.js, proverbs.js, psalm.js, revelation.js, romans.js, ruth.js, songofsolomon.js, titus.js, zechariah.js, Zephaniah.js (Ronigan)
 
 HOW TO ADD A NEW ENTRY
 ----------------------
