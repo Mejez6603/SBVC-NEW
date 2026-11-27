@@ -212,6 +212,12 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-27  20:06  ADD  Splash screen on the home page: the Mejez Studio logo animation plays once (about 6 seconds, click or press a key to skip), then the Open Control Panel screen shows (assets/splash.gif, js/splash.js, index.html, css/style.css; tools/serve.ps1 now knows the .gif type)
 
+2026-11-27  20:12  CHANGE  Browser tab icon is now the white Mejez Studio signature with a clear background, on every page (assets/favicon.ico, assets/icon-192.png, all .html files)
+
+2026-11-27  20:16  ADD  Link preview (title, description, 1200x630 picture) for https://sbvc-new.vercel.app on all pages except the Presentation window (assets/preview.png, index/controller/hymnals/preaching/powerpoint/about .html, README.md)
+
+2026-11-27  20:18  CHANGE  Link preview picture is now a screenshot of the Bible controller (assets/preview.png, 1200x630)
+
 HOW TO ADD A NEW ENTRY
 ----------------------
 Add one new line at the bottom with today's date, the time, a type, and a short description of what changed
