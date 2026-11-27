@@ -93,7 +93,7 @@ SBVC-NEW/
 ├── present.html        Presentation window for the projector
 ├── about.html          About / how it works
 ├── START.bat           Starts the local server on port 8765
-├── vercel.json         Security headers for the online (Vercel) site
+├── vercel.json         Security headers and addresses without .html for the online (Vercel) site
 ├── sitemap.xml         List of pages for search engines (update it if pages or the address change)
 ├── robots.txt          Tells search engines where the sitemap is
 ├── UPDATE_LOG.txt      Every change, newest at the bottom

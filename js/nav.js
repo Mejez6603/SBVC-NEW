@@ -7,7 +7,8 @@
     ['powerpoint.html', 'PowerPoint'],
     ['about.html', 'About']
   ];
-  var here = location.pathname.split('/').pop() || 'index.html';
+  // the online site shows addresses without .html (cleanUrls in vercel.json), START.bat keeps it
+  var here = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '');
   var host = document.getElementById('topnav');
   if (!host) return;
   var nav = document.createElement('nav');
@@ -15,7 +16,7 @@
     var a = document.createElement('a');
     a.href = l[0];
     a.textContent = l[1];
-    if (here === l[0]) a.className = 'active';
+    if (here === l[0].replace(/\.html$/, '')) a.className = 'active';
     nav.appendChild(a);
   });
   host.appendChild(nav);

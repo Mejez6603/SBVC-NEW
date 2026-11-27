@@ -232,6 +232,8 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-27  21:20  CHANGE  About page uses two columns on wide screens (1100px and up): Pages / Start / Features / Keys on the left, Mission & Vision and Report / Message on the right; one column on smaller screens (about.html, css/style.css)
 
+2026-11-28  07:20  CHANGE  Online addresses no longer show .html (cleanUrls in vercel.json); the current tab stays highlighted, link previews and sitemap use the new addresses (vercel.json, js/nav.js, sitemap.xml, about/controller/hymnals/preaching/powerpoint .html, README.md)
+
 HOW TO ADD A NEW ENTRY
 ----------------------
 Add one new line at the bottom with today's date, the time, a type, and a short description of what changed
