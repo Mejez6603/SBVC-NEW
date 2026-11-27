@@ -13,6 +13,7 @@ SBVC is the static (plain web files) version of an earlier Next.js project.
 ## Features
 
 - **Link preview** – sending https://sbvc-new.vercel.app in apps such as Discord shows a title, description and picture. The tags are near the top of each page; if the web address changes, update it there.
+- **Report / Message** - a form at the bottom of the About page for bugs and suggestions. It uses [Web3Forms](https://web3forms.com), so no email address is written in the site. **To switch it on:** get an access key from Web3Forms using the address that should receive the messages, then paste it into `data-access-key=""` in `about.html`. Needs internet.
 - **Splash screen** – the Mejez Studio logo animation plays when the home page opens, then the **Open Control Panel** screen appears. Click or press a key to skip it.
 - **Bible controller** – book / chapter / verse lists, search, three translations (KJV, ADB, TCB); picking a verse scrolls the same verse into view in the other translation.
 - **Hymnals** – search 308 English and 79 Tagalog hymns, build a queue of up to 15 and project them with their own styling.
@@ -110,6 +111,7 @@ SBVC-NEW/
 │   ├── present.js      Presentation window
 │   ├── live.js         Live mode, chat and security
 │   ├── pptx.js         .pptx export and import
+│   ├── feedback.js     Report / Message form on the About page
 │   ├── splash.js       Home page: splash screen and Open Control Panel
 │   └── vendor/         PeerJS, PptxGenJS, JSZip (+ README with checksums)
 ├── fonts/              The fonts, saved locally (+ README)
