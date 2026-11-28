@@ -16,7 +16,7 @@
 		"14": "Mangagpakabanal kayo ng isang ayuno, magsitawag kayo ng isang takdang kapulungan, pisanin ninyo ang mga matanda at ang lahat na mananahan sa lupain sa bahay ng Panginoon ninyong Dios, at magsidaing kayo sa Panginoon.",
 		"15": "Sa aba ng araw na yaon! sapagka't ang araw ng Panginoon ay malapit na, at darating na parang kagibaan na mula sa Makapangyarihan sa lahat.",
 		"16": "Hindi baga nahiwalay ang pagkain sa harap ng ating mga mata, oo, ang kagalakan at ang kasayahan sa bahay ng ating Dios?",
-		"17": "Ang mga binhi ay nangabubulok sa kanilang bugal; ang mga kamalig ay nangakahandusay na sira, ang mga imbakan aybagsak; sapagka't ang trigo ay natuyo.",
+		"17": "Ang mga binhi ay nangabubulok sa kanilang bugal; ang mga kamalig ay nangakahandusay na sira, ang mga imbakan ay bagsak; sapagka't ang trigo ay natuyo.",
 		"18": "Ganyan na lamang ang ungal ng mga hayop! ang mga kawan ng mga baka ay nangatataranta, sapagka't wala silang pastulan; oo, ang mga kawan ng mga tupa ay nangapahamak.",
 		"19": "Oh Panginoon, sa iyo'y dumadaing ako: sapagka't sinupok ng apoy ang mga pastulan sa ilang, at sinunog ng liyab ang lahat na punong kahoy sa parang.",
 		"20": "Oo, ang mga hayop sa parang ay nagsisihingal sa iyo; sapagka't ang mga batis ng tubig ay natuyo, at sinupok ng apoy ang mga pastulan sa ilang."
@@ -37,7 +37,7 @@
 		"13": "At papunitin ninyo ang inyong puso, at hindi ang inyong mga damit, at magsipanumbalik kayo sa Panginoon ninyong Dios: sapagka't siya'y maawain at puspos ng kahabagan, banayad sa pagkagalit, at sagana sa kagandahang-loob, at nagsisisi siya sa kasamaan.",
 		"14": "Sinong nakaaalam kung siya'y hindi magbabalik-loob at magsisisi, at magiiwan ng pagpapala sa likuran niya, sa makatuwid baga'y ng isang handog na harina at ng isang inuming handog sa Panginoon ninyong Dios?",
 		"15": "Hipan ninyo ang pakakak sa Sion, mangagpakabanal kayo ng isang ayuno, magsitawag kayo ng isang takdang kapulungan:",
-		"16": "Pisanin ninyo ang bayan, p consacrain ninyo ang kapulungan, tipunin ninyo ang mga matanda, pisanin ninyo ang mga anak, at ang mga sumususo sa mga suso: lumabas ang bagong kasal na lalake sa kaniyang silid, at ang bagong kasal na babae sa kaniyang silid.",
+		"16": "Pisanin ninyo ang bayan, consacrain ninyo ang kapulungan, tipunin ninyo ang mga matanda, pisanin ninyo ang mga anak, at ang mga sumususo sa mga suso: lumabas ang bagong kasal na lalake sa kaniyang silid, at ang bagong kasal na babae sa kaniyang silid.",
 		"17": "Magsiiyak ang mga saserdote, na mga tagapangasiwa ng Panginoon, sa pagitan ng portiko at ng dambana, at sabihin nila, Maawa ka sa iyong bayan, Oh Panginoon, at huwag mong ibigay ang iyong bayan sa kahihiyan, na ang mga bansa ay magpuno sa kanila: bakit nila sasabihin sa gitna ng mga bayan, Saan nandoon ang kanilang Dios?",
 		"18": "Kung magkagayo'y magiging masikap ang Panginoon dahil sa kaniyang lupain, at mahahabag sa kaniyang bayan.",
 		"19": "At ang Panginoon ay sasagot, at magsasabi sa kaniyang bayan, Narito, padadalhan ko kayo ng trigo, at alak, at langis, at kayo'y masisiyahan sa mga yaon: at hindi ko na gagawin kayong kahihiyan sa gitna ng mga bansa:",

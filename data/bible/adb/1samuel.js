@@ -476,7 +476,7 @@
 		"36": "Pinatay ng iyong lingkod ang leon at gayon din ang oso: at ang Filisteong ito na hindi tuli ay magiging gaya ng isa sa kanila, yamang kaniyang hinamon ang mga hukbo ng Dios na buhay.",
 		"37": "At sinabi ni David, Ang Panginoon na nagligtas sa akin sa pangalmot ng leon, at sa pangalmot ng oso, ay siyang magliligtas sa akin sa kamay ng Filisteong ito. At sinabi ni Saul kay David, Yumaon ka, at ang Panginoon ay sasa iyo.",
 		"38": "At sinuutan ni Saul si David ng kaniyang mga sandata, at pinutungan niya ang kaniyang ulo ng isang turbanteng tanso, at sinuutan din niya siya ng isang baluti.",
-		"39": "At ibinigkis ni David ang kaniyang tabak sa kaniyang sandata, at kaniyang sinubukang yumao't; sapagka't hindi niya sinubok. At sinabi ni David kay Saul, Hindi ako makayayaon na may mga ito; sapagka't hindi ko nasubok. At mga inalis ni David.",
+		"39": "At ibinigkis ni David ang kaniyang tabak sa kaniyang sandata, at kaniyang sinubukang yumaon; sapagka't hindi niya sinubok. At sinabi ni David kay Saul, Hindi ako makayayaon na may mga ito; sapagka't hindi ko nasubok. At mga inalis ni David.",
 		"40": "At kaniyang kinuha ang kaniyang tungkod sa kaniyang kamay, at pumili para sa kaniya ng limang makinis na bato sa batis, at inilagay sa supot na pastulan na dala niya, sa makatuwid baga'y sa isang sisidlan; at ang kaniyang panghilagpos ay nasa kaniyang kamay: at siya'y lumapit sa Filisteo.",
 		"41": "At ang Filisteo ay lumapit na unti-unti kay David; at ang lalaking may dala ng kalasag ay nasa unahan niya.",
 		"42": "At nang tumingin ang Filisteo, at makita si David, ay kaniyang hinamak siya: sapagka't siya'y isang bata pa lamang, at mapulapula, at may magandang bikas.",
@@ -766,7 +766,8 @@
 		"21": "At si David ay sumagot, at nagsabi, Narito, ang sibat, Oh hari! at bayaang tumawid ang isa sa mga bataan at kunin.",
 		"22": "At isasauli ng Panginoon sa bawa't tao ang kaniyang katuwiran at ang kaniyang pagtatapat: yamang ibinigay ka ng Panginoon sa aking kamay sa araw na ito, at hindi ko iniunat ang aking kamay laban sa pinahiran ng langis ng Panginoon.",
 		"23": "At, narito, kung paanong ang iyong buhay ay lubhang mahalaga sa araw na ito sa aking mga mata, ay maging gayon nawa kamahal ang aking buhay sa mga mata ng Panginoon, at iligtas niya ako sa lahat ng kapighatian.",
-		"24": "Nang magkagayo'y sinabi ni Saul kay David, Pagpalain ka, anak kong David: ikaw ay gagawa ng mga dakilang bagay, at walang pagsalang mananaig ka. Sa gayo'y yumaon si David ng kaniyang lakad, at si Saul ay bumalik sa kaniyang dako."
+		"24": "Nang magkagayo'y sinabi ni Saul kay David, Pagpalain ka, anak kong David: ikaw ay gagawa ng mga dakilang bagay, at walang pagsalang mananaig ka. Sa gayo'y yumaon si David ng kaniyang lakad, at si Saul ay bumalik sa kaniyang dako.",
+		"25": "Nang magkagayo'y sinabi ni Saul kay David, Pagpalain ka, anak kong David: ikaw ay gagawa na makapangyarihan, at tunay na ikaw ay mananaig. Sa gayo'y nagpatuloy si David ng kaniyang lakad, at si Saul ay bumalik sa kaniyang dako."
 	},
 	"27": {
 		"1": "At sinabi ni David sa kaniyang puso, Ako ngayo'y mamamatay na isang araw sa pamamagitan ng kamay ni Saul: walang bagay na maigi sa akin kundi ang tumakas na madali sa lupain ng mga Filisteo; at si Saul ay mawawalan ng pag-asa sa akin, na hahanapin pa ako sa lahat ng mga hangganan ng Israel: sa gayo'y tatakasan ko ang kaniyang kamay.",

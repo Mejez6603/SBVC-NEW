@@ -332,7 +332,7 @@
 	"18": {
 		"1": "Pagkatapos ng mga bagay na ito ay nakita ko ang ibang anghel na nananaog mula sa langit, na may dakilang kapamahalaan; at ang lupa ay naliwanagan ng kaniyang kaluwalhatian.",
 		"2": "At siya'y sumigaw ng malakas na tinig, na nagsasabi, Naguho, naguho ang dakilang Babilonia, at naging tahanan ng mga demonio, at kulungan ng bawa't karumaldumal na espiritu, at kulungan ng bawa't karumaldumal at kasuklamsuklam na mga ibon.",
-		"3": "Sapagka't dahil sa alak ng kagalitan ng kaniyang pakikiapid ay nangaguho ang lahat ng mga bansa; at ang mga hari sa lupa ay nangakiapid sa kaniya, at ang mga mangangalakal sa lupa ay nagsiyaman dahil sa kalabisan ng kaniyang k роскоши.",
+		"3": "Sapagka't dahil sa alak ng kagalitan ng kaniyang pakikiapid ay nangaguho ang lahat ng mga bansa; at ang mga hari sa lupa ay nangakiapid sa kaniya, at ang mga mangangalakal sa lupa ay nagsiyaman dahil sa kalabisan ng kaniyang kalayawan.",
 		"4": "At narinig ko ang ibang tinig na mula sa langit, na nagsasabi, Mangagsilabas kayo sa kaniya, bayan ko, upang huwag kayong mangaramay sa kaniyang mga kasalanan, at huwag kayong magsitanggap ng kaniyang mga salot:",
 		"5": "Sapagka't ang kaniyang mga kasalanan ay umabot hanggang sa langit, at naalaala ng Dios ang kaniyang mga katampalasanan.",
 		"6": "Ibigay ninyo sa kaniya ang gaya naman ng kaniyang ibinigay, at bayaran ninyo siya ng ibayong ayon sa kaniyang mga gawa: sa sarong kaniyang pinaghaluan, ay ipaghalo ninyo siya ng ibayo.",

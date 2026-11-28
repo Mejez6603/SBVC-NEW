@@ -2,7 +2,7 @@
 	"1": {
 		"1": "Si Pablo, na bilanggo ni Cristo Jesus, at si Timoteo na ating kapatid, kay Filemon na aming minamahal at kamanggagawa,",
 		"2": "At kay Apia na ating kapatid na babae, at kay Arquipo na kapuwa kawal namin, at sa iglesia sa iyong bahay:",
-		"3": "SGrace sa inyo at kapayapaan na mula sa Dios na ating Ama at sa Panginoon Jesucristo.",
+		"3": "Sumainyo nawa ang biyaya at kapayapaan na mula sa Dios na ating Ama at sa Panginoon Jesucristo.",
 		"4": "Nagpapasalamat akong lagi sa aking Dios, na binabanggit kita sa aking mga panalangin,",
 		"5": "Sa pagkabalita ko ng iyong pagibig, at ng pananampalataya mo sa Panginoon Jesus, at sa lahat ng mga banal;",
 		"6": "Upang ang pakikipagkaisa ng iyong pananampalataya ay maging mabisa sa pagkaalam ng bawa't mabuting bagay na nasa iyo, sa kay Cristo.",

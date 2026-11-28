@@ -21,7 +21,9 @@
 		"19": "Sapagka't ang Anak ng Dios, si Jesucristo, na ipinangaral namin sa inyo, ako at si Silvano at si Timoteo, hindi naging oo at hindi, kundi sa kaniya ay naging oo.",
 		"20": "Sapagka't maging gaano man ang mga pangako ng Dios, ay nasa kaniya ang oo: kaya nga naman na sa pamamagitan niya ang Siya Nawa sa ikaluluwalhati ng Dios sa pamamagitan namin.",
 		"21": "Ngayon, siya na ang nagpapatibay sa amin na kasama ninyo kay Cristo, at nagpahid sa atin, ay ang Dios,",
-		"22": "Na siyang nagtatak din sa atin, at nagbigay ng patotoo ng Espiritu sa ating mga puso."
+		"22": "Na siyang nagtatak din sa atin, at nagbigay ng patotoo ng Espiritu sa ating mga puso.",
+		"23": "Datapuwa't ang Dios ang tinatawag kong maging saksi sa aking kaluluwa, na upang huwag kayong papagdamdamin ay hindi muna ako napariyan sa Corinto.",
+		"24": "Hindi sa kami ay may pagkapanginoo sa inyong pananampalataya, kundi kami ay mga tagatulong sa inyong katuwaan: sapagka't sa pananampalataya kayo'y nangagsisitatag."
 	},
 	"2": {
 		"1": "Datapuwa't ito'y ipinasiya ko sa aking sarili, na hindi na ako muling paririyan sa inyo na may kalumbayan.",
@@ -133,7 +135,7 @@
 		"5": "Sapagka't nagsidating man kami sa Macedonia ang aming laman ay hindi nagkaroon ng anomang kapahingahan, kundi sa lahat kami ay pinipighati; sa labas ay mga pagbabaka, sa loob ay mga katakutan.",
 		"6": "Gayon ma'y ang Dios na umaaliw sa mga mababang-loob, ay kami'y inaliw sa pamamagitan ng pagdating ni Tito;",
 		"7": "At hindi lamang sa kaniyang pagdating, kundi pati naman sa kaaliwan na kaniyang inaliw sa inyo, samantalang isinasaysay niya sa amin ang inyong pananabik, ang inyong pagtangis, ang inyong pagmamalasakit dahil sa akin; ano pa't ako'y lalong nagalak.",
-		"8": "Sapagka't bagama't ako'y nakapagpalumbay sa inyo sa aking sulat, ay hindi ko dinaramdam: bagama't dinamdam ko noong una-sapagka't nakikita kong ang sulat na yaon ay nakapagpalumbay sa inyo, bagama't sa maikling panahon lamang.",
+		"8": "Sapagka't bagama't ako'y nakapagpalumbay sa inyo sa aking sulat, ay hindi ko dinaramdam: bagama't dinamdam ko (sapagka't nakikita kong ang sulat na yaon ay nakapagpalumbay sa inyo, bagama't sa maikling panahon lamang.",
 		"9": "Ngayo'y nagagalak ako, hindi dahil sa inyong pagkalumbay, kundi dahil sa inyong mga pagkalumbay na patungo sa pagsisisi: sapagka't kayo'y pinalumbay ayon sa kalooban ng Dios, upang sa anoman ay huwag kayong mangagkaroon ng kalugihan dahil sa amin.",
 		"10": "Sapagka't ang kalumbayang mula sa Dios, ay gumagawa ng pagsisisi sa ikaliligtas, na hindi ikalulungkot: datapuwa't ang kalumbayang ayon sa sanglibutan ay ikamamatay.",
 		"11": "Sapagka't narito, ito rin ang inyong ikinalulumbay ayon sa kalooban ng Dios, anong pagaapurang ginawa nito sa inyo, oo, anong pagtatanggol ng inyong sarili, oo, anong pagkagalit, oo, anong pagkatakot, oo, anong pananabik, oo, anong pagmamalasakit, oo, anong paghihiganti! Sa lahat ng mga bagay ay pinatunayan ninyo na kayo'y malilinis sa bagay na ito.",
@@ -259,7 +261,7 @@
 		"15": "At ako'y gugugol ng may malaking kagalakan at pagugugol dahil sa inyong mga kaluluwa. Kung kayo'y iniibig kong lalong higit, ako baga'y iniibig ninyong kaunti?",
 		"16": "Datapuwa't magkagayon man, ako'y hindi naging pasan sa inyo; kundi, sa pagiging tuso, kayo'y hinuli ko sa daya.",
 		"17": "Kayo baga'y aking dinaya sa pamamagitan ng sinoman sa mga sinugo ko sa inyo?",
-		"18": "Ipinamanhik ko kay Tito, at sinugo kong kasama niya ang kapatid. Kayo baga'y dinaya ni Tito? hindi baga kami nagsilakad sa isang Espiritu? hindi baga kami nagsilakad sa одних mga hakbang?",
+		"18": "Ipinamanhik ko kay Tito, at sinugo kong kasama niya ang kapatid. Kayo baga'y dinaya ni Tito? hindi baga kami nagsilakad sa isang Espiritu? hindi baga kami nagsilakad sa gayon ding mga hakbang?",
 		"19": "Inaakala ninyo na hanggang ngayo'y nangagdadahilan kami sa inyo. Sa paningin ng Dios ay nagsasalita kami sa pangalan ni Cristo. Datapuwa't ang lahat ng mga bagay, mga minamahal, ay sa ikapagpapatibay ninyo.",
 		"20": "Sapagka't ako'y natatakot, baka sa anomang paraan, na sa aking pagdating ay masumpungan ko kayong hindi ko ibig, at ako ay inyong masumpungang hindi ninyo ibig; baka sa anomang paraan ay magkaroon ng pagtatalo, mga paninibugho, mga kagalitan, mga pagkakampikampi, mga pagupasala, mga pagbubulongbulungan, mga pagpapalalo, mga pagkakagulo;",
 		"21": "Baka sa aking pagdating na muli ay ako'y pababain ng aking Dios sa harapan ninyo, at ako'y malumbay dahil sa marami sa mga nagkasala na noong una, at hindi nangagsisi sa karumihan at sa pakikiapid at sa kalibugan na kanilang ginawa."

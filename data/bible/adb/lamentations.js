@@ -46,8 +46,7 @@
 		"19": "Ikaw ay bumangon, sumigaw ka sa gabi, sa pasimula ng mga pagpupuyat; ibuhos mo ang iyong puso na parang tubig sa harap ng mukha ng Panginoon: i-taas mo ang iyong mga kamay sa kaniya dahil sa buhay ng iyong mga batang anak, na nanganglulupaypay sa gutom sa dulo ng lahat na lansangan.",
 		"20": "Iyong masdan, Oh Panginoon, at tingnan mo, kung kanino mo ginawa ang ganito! Kakanin baga ng mga babae ang kanilang ipinanganak, ang mga anak na maliit na kinakalong sa mga kamay? Papatayin baga ang saserdote at ang propeta sa santuario ng Panginoon?",
 		"21": "Ang binata at ang matanda ay nangahihiga sa lupa sa mga lansangan; ang aking mga dalaga at ang aking mga binata ay nangabuwal sa tabak: iyong pinatay sila sa kaarawan ng iyong galit; iyong pinatay at hindi ka naawa.",
-		"22": "Iyong tinawag, na gaya ng sa kaarawan ng takdang kapulungan, ang aking mga kakilabutan sa lahat ng dako; at walang nakatanan o nalabi sa kaarawan ng galit ng Panginoon: ang aking mga kinalong at inalagaan ay nilipol ng aking kaaway.",
-		"23": "Iyong tinawag, na gaya ng sa kaarawan ng takdang kapulungan, ang aking mga kakilabutan sa lahat ng dako; at walang nakatanan o nalabi sa kaarawan ng galit ng Panginoon: ang aking mga kinalong at inalagaan ay nilipol ng aking kaaway."
+		"22": "Iyong tinawag, na gaya ng sa kaarawan ng takdang kapulungan, ang aking mga kakilabutan sa lahat ng dako; at walang nakatanan o nalabi sa kaarawan ng galit ng Panginoon: ang aking mga kinalong at inalagaan ay nilipol ng aking kaaway."
 	},
 	"3": {
 		"1": "Ako ang lalake na nakakita ng pagdadalamhati sa pamamagitan ng pamalo ng kaniyang poot.",
