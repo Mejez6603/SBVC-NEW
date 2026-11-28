@@ -238,6 +238,8 @@ text. Parts keep their style on the projector and after a refresh. A new design 
 
 2026-11-28  07:59  ADD  CONTRIBUTING.md: how to report bugs, set up, make changes, edit Bible and hymn text, test and log changes; linked from the README (CONTRIBUTING.md, README.md)
 
+2026-11-28 7:20PM - 8:57PM Checking the verse missing KJV Genesis , Exodus , Leviticus , Numbers, Ruth has no missing verses (Ronigan)
+
 2026-11-28 17:10 Update TCB mark.js, matthew.js, micah.js, Nahum.js, Nehemiah.js, Obadiah.js, philemon.js, proverbs.js, psalm.js, revelation.js, romans.js, ruth.js, songofsolomon.js, titus.js, zechariah.js, Zephaniah.js (Clod)
 HOW TO ADD A NEW ENTRY
 ----------------------
