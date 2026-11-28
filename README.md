@@ -302,6 +302,7 @@ The dated history is in [`UPDATE_LOG.txt`](UPDATE_LOG.txt) (newest at the bottom
 
 ## Contributing and Policies
 
+- [How to Contribute](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security Policy](SECURITY.md)
 
